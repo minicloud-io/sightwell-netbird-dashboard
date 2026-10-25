@@ -36,8 +36,8 @@ never exposes it: `management/server/idp/embedded.go` hard-codes
 
 The Sightwell server fork, `minicloud-io/sightwell-netbird-server` (branch
 `feat/idp-theme` on upstream `v0.81.4`), adds the missing plumbing as a
-`server.auth.theme` block; see `docs/sightwell/README.md` there. With a
-server image built from that fork:
+`server.auth.theme` block; see `docs/sightwell/README.md` there. A server image built from that fork is published, see `docs/sightwell/RELEASE.md`
+("Server image for the themed sign-in pages"); with it:
 
 ```yaml
 server:

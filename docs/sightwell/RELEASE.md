@@ -144,6 +144,27 @@ sidebar version block (`/instance/version`) shows both once signed in. If the
 management server is older than what `v2.95.0` expects, upgrade the server
 first or pick an older baseline (`UPSTREAM.md`).
 
+## Server image for the themed sign-in pages
+
+The sign-in, sign-out, password, device and error pages come from the NetBird
+server, not the dashboard. Theming them needs the Sightwell server fork's
+image (`minicloud-io/sightwell-netbird-server`, upstream `v0.81.4` plus the
+`server.auth.theme` setting) in place of `netbirdio/netbird-server`:
+
+| | |
+| --- | --- |
+| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.1@sha256:311c0b8e9bae21d24c97cecf37a21d3109cee17f971701ecc934a38a77cc9d33` |
+| Platforms | linux/amd64, linux/arm64 |
+| Config | `server.auth.theme: {dir: /etc/netbird/idp-theme, name: sightwell, displayName: "Sightwell Connectivity"}` in the server's `config.yaml` |
+| Theme files | `deploy/idp-theme/` from this repository, mounted as in its README |
+
+This is a change to the server workload, outside the "replace only the
+dashboard image" scope of the dashboard rollout above; treat it as its own
+change with its own rollback (the previous `netbirdio/netbird-server`
+digest, read the same way as below). Without the `theme` block the fork's
+server behaves exactly like upstream's, so the image can be rolled first
+and the theme switched on afterwards.
+
 ## Rollback
 
 Record the digest the cluster runs **before** the change; it is the rollback
