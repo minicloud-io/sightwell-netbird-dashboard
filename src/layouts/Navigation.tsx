@@ -1,17 +1,23 @@
 "use client";
 
 import { ScrollArea } from "@components/ScrollArea";
+import { SmallBadge } from "@components/ui/SmallBadge";
 import { cn } from "@utils/helpers";
 import { isNetBirdCloud } from "@utils/netbird";
+import { InfoIcon } from "lucide-react";
+import * as React from "react";
 import AccessControlIcon from "@/assets/icons/AccessControlIcon";
+import ActivityIcon from "@/assets/icons/ActivityIcon";
 import AgentNetworkIcon from "@/assets/icons/AgentNetworkIcon";
 import ControlCenterIcon from "@/assets/icons/ControlCenterIcon";
 import DNSIcon from "@/assets/icons/DNSIcon";
 import DocsIcon from "@/assets/icons/DocsIcon";
 import IntegrationIcon from "@/assets/icons/IntegrationIcon";
 import PeerIcon from "@/assets/icons/PeerIcon";
+import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import SettingsIcon from "@/assets/icons/SettingsIcon";
 import TeamIcon from "@/assets/icons/TeamIcon";
+import { docsUrl, hideIntegrations } from "@/branding/runtime";
 import { DistributorNavigation } from "@/cloud/distributor/DistributorNavigation";
 import { MSPNavigationItem } from "@/cloud/msp/MSPNavigationItem";
 import SidebarItem from "@/components/SidebarItem";
@@ -24,11 +30,6 @@ import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode
 import { useMyAgentNetworkSetup } from "@/modules/agent-network/useMyAgentNetworkSetup";
 import { NavigationUsageInfo } from "@/modules/billing/NavigationUsageInfo";
 import { NetworkNavigation } from "@/modules/networks/misc/NetworkNavigation";
-import { SmallBadge } from "@components/ui/SmallBadge";
-import * as React from "react";
-import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
-import ActivityIcon from "@/assets/icons/ActivityIcon";
-import { InfoIcon } from "lucide-react";
 
 type Props = {
   fullWidth?: boolean;
@@ -364,16 +365,20 @@ export default function Navigation({
                   label="Integrations"
                   href={"/integrations"}
                   exactPathMatch={true}
+                  // Fork-specific: hidden unless SIGHTWELL_HIDE_INTEGRATIONS=false.
                   visible={
-                    permission?.edr?.read ||
-                    permission?.idp?.read ||
-                    permission?.event_streaming?.read ||
-                    (!isNetBirdCloud() && (permission?.settings?.read ?? false))
+                    !hideIntegrations() &&
+                    (permission?.edr?.read ||
+                      permission?.idp?.read ||
+                      permission?.event_streaming?.read ||
+                      (!isNetBirdCloud() &&
+                        (permission?.settings?.read ?? false)))
                   }
                 />
                 <SidebarItem
                   icon={<DocsIcon />}
-                  href={"https://docs.netbird.io/"}
+                  // Fork-specific: SIGHTWELL_DOCS_URL (default sightwell.ai/connectivity).
+                  href={docsUrl()}
                   target={"_blank"}
                   label="Documentation"
                   visible={true}

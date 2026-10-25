@@ -35,6 +35,12 @@ interface Config {
   // see in a permanent banner (NETBIRD_ANNOUNCEMENT), e.g. which environment
   // or backend instance a dashboard belongs to. Unset for none.
   announcement?: string;
+  // Sightwell fork: deployment settings for the presentation layer.
+  // sightwellDocsUrl: where the Documentation links point (SIGHTWELL_DOCS_URL).
+  // sightwellHideIntegrations: hide the Integrations menu (SIGHTWELL_HIDE_INTEGRATIONS,
+  // default true; only the string "false" shows it).
+  sightwellDocsUrl?: string;
+  sightwellHideIntegrations: boolean;
 }
 
 /**
@@ -102,6 +108,9 @@ const loadConfig = (): Config => {
       .map((email: string) => email.trim())
       .filter(Boolean),
     announcement: configJson?.announcement || undefined,
+    sightwellDocsUrl: configJson?.sightwellDocsUrl || undefined,
+    sightwellHideIntegrations:
+      configJson?.sightwellHideIntegrations !== "false",
   } as Config;
 };
 

@@ -34,6 +34,8 @@ const config = {
   hubspotSurveyFormId: "",
   analyticsExcludedEmails: "",
   announcement: "",
+  sightwellDocsUrl: "https://sightwell.ai/connectivity",
+  sightwellHideIntegrations: "true",
 };
 
 export default config;

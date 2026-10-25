@@ -102,12 +102,13 @@ not done.
 | Product lockup elsewhere | `src/components/NetBirdLogo.tsx` (shim → `BrandLogo`) | setup wizard, onboarding, pending approval, AWS plan page (cloud only) |
 | Product mark | `src/branding/BrandIcon.tsx` | session lost, OIDC error, error page, invite |
 | NetBird technology mark | `src/assets/icons/NetBirdIcon.tsx` | **unchanged** where it marks the NetBird client/server: peer version cell, posture checks, SSH instructions, owner role, invites table |
-| Sidebar | `src/layouts/Navigation.tsx` | "About" item added under Documentation |
-| Help menu | `src/components/ui/HelpAndSupportButton.tsx` | NetBird documentation, client troubleshooting, NetBird community forum, About, Source code; NetBird Slack and the feedback form removed |
+| Sidebar | `src/layouts/Navigation.tsx` | "About" item added under Documentation; "Documentation" points at `SIGHTWELL_DOCS_URL`; "Integrations" hidden unless `SIGHTWELL_HIDE_INTEGRATIONS=false` |
+| Help menu | `src/components/ui/HelpAndSupportButton.tsx` | Documentation (`SIGHTWELL_DOCS_URL`), NetBird technical reference, client troubleshooting, NetBird community forum, About, Source code; NetBird Slack and the feedback form removed |
 | Announcements | `src/contexts/AnnouncementProvider.tsx` | remote NetBird banners off (`BRAND.announcementsUrl` empty); `NETBIRD_ANNOUNCEMENT` and billing notices still work; Storybook sets the feed URL so the banner stories render |
 | About page | `src/app/(dashboard)/about/` | new: identity, build, AGPL offer, help |
 | Source offer footer | `src/branding/BrandFooter.tsx` | setup wizard, invite, session lost, OIDC error, error page, pending approval |
 | Copy | `error/page.tsx`, `invite/page.tsx`, `InstanceSetupWizard.tsx`, `PendingApproval.tsx` | "Welcome to Sightwell Connectivity", "account administrator", no NetBird support desk link |
+| Version block | `src/components/VersionInfo.tsx`, `src/utils/version.ts` | fork versions shown in full (`v2.95.0-sightwell.3`), fork builds compared by build number, "Update available" links to the fork's releases; the server reports latest versions from the fork repositories when `server.updates` is set |
 | Loading | `src/components/ui/FullScreenLoading.tsx` → `src/branding/BrandSpinner.tsx` | Sightwell mark with a turning signal-orange arc instead of upstream's bouncing bars; stops under reduced motion |
 | Sign-in, sign-out, password, device and error pages | **NetBird server (embedded Dex)**, not the dashboard | themed in `deploy/idp-theme/`; activated by `server.auth.theme` in the Sightwell server fork (see its README) |
 | Primary button | `src/components/Button.tsx` | ink text on orange |
@@ -135,8 +136,17 @@ validates them and derives the tree, licence and modifications URLs
 (GitHub URL layout). Nothing is injected into HTML as a raw string: values
 are rendered by React, URLs are parsed before use.
 
-Runtime (`config.json`, `docker/init_react_envs.sh`): unchanged. There is no
-runtime branding switch; the brand is a build-time property of the image.
+Runtime (`config.json`, `docker/init_react_envs.sh`), fork-specific additions
+next to the `NETBIRD_*` settings; the brand itself stays a build-time
+property of the image:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `SIGHTWELL_DOCS_URL` | `https://sightwell.ai/connectivity` | where the sidebar "Documentation", the help menu's "Documentation" and the About page's primary documentation button point; http(s) only, anything else falls back to the default. NetBird's technical reference stays reachable from the help menu and About as "NetBird technical reference" |
+| `SIGHTWELL_HIDE_INTEGRATIONS` | `true` | hides the Integrations menu (NetBird Cloud's integrations surface); only the string `false` shows it. The route itself is not removed |
+
+Read through `src/branding/runtime.ts` (`docsUrl()`, `hideIntegrations()`).
+The Helm chart sets both from `dashboard.docsUrl` and `dashboard.hideIntegrations`.
 
 ## Storybook
 

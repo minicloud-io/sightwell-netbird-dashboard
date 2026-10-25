@@ -42,6 +42,8 @@ spec:
             - { name: AUTH_REDIRECT_URI, value: "/nb-auth" }
             - { name: AUTH_SILENT_REDIRECT_URI, value: "/nb-silent-auth" }
             - { name: USE_AUTH0, value: "false" }
+            - { name: SIGHTWELL_DOCS_URL, value: {{ .Values.dashboard.docsUrl | quote }} }
+            - { name: SIGHTWELL_HIDE_INTEGRATIONS, value: {{ .Values.dashboard.hideIntegrations | toString | quote }} }
             {{- range $k, $v := .Values.dashboard.extraEnv }}
             - { name: {{ $k | quote }}, value: {{ $v | quote }} }
             {{- end }}

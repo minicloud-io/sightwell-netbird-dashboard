@@ -97,6 +97,10 @@ dashboard:
     pullPolicy: IfNotPresent
   replicaCount: 1
   containerPort: 8080 # rootless image; the standard image listens on 80 as root
+  # Where the dashboard's Documentation links point (http(s) only).
+  docsUrl: https://sightwell.ai/connectivity
+  # Hide the Integrations menu (the NetBird Cloud integrations surface).
+  hideIntegrations: true
   # Extra environment for the dashboard, e.g. NETBIRD_ANNOUNCEMENT: "Staging"
   extraEnv: {}
   podSecurityContext:

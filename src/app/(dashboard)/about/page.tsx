@@ -32,6 +32,7 @@ import {
   UPSTREAM,
 } from "@/branding/brand";
 import { BrandLogo } from "@/branding/BrandLogo";
+import { docsUrl } from "@/branding/runtime";
 import PageContainer from "@/layouts/PageContainer";
 
 const dashboardVersion =
@@ -192,12 +193,23 @@ export default function AboutPage() {
             <SectionTitle>Help</SectionTitle>
             <div className={"px-4 py-4 flex flex-col gap-3"}>
               <Paragraph className={"block text-sm"}>
-                The networking technology, its client installers and its
-                management API are documented by NetBird. For questions about
-                this {BRAND.fullName} deployment, its identity provider or who
-                may access it, contact your administrator.
+                {BRAND.fullName} is documented at the link below. The networking
+                technology underneath, its client installers and its management
+                API are documented by NetBird. For questions about this
+                deployment, its identity provider or who may access it, contact
+                your administrator.
               </Paragraph>
               <div className={"flex flex-wrap gap-2 mt-1"}>
+                <a
+                  href={docsUrl()}
+                  target={"_blank"}
+                  rel={"noopener noreferrer"}
+                >
+                  <Button variant={"primary"} size={"xs"}>
+                    <BookText size={14} />
+                    Documentation
+                  </Button>
+                </a>
                 <a
                   href={BRAND.links.documentation}
                   target={"_blank"}
@@ -205,7 +217,7 @@ export default function AboutPage() {
                 >
                   <Button variant={"secondary"} size={"xs"}>
                     <BookText size={14} />
-                    NetBird documentation
+                    NetBird technical reference
                   </Button>
                 </a>
                 <a

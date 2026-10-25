@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { BRAND, brandSourceTreeUrl } from "@/branding/brand";
+import { docsUrl } from "@/branding/runtime";
 
 /*
  * Fork-specific (Sightwell Connectivity). Upstream's menu points at NetBird's
@@ -68,6 +69,20 @@ export default function HelpAndSupportButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          href={docsUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          asChild
+        >
+          <div className={"flex gap-3 items-center"}>
+            <BookText size={14} />
+            Documentation
+          </div>
+          <DropdownMenuShortcut>
+            <ArrowUpRightIcon size={16} />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
           href={BRAND.links.documentation}
           target="_blank"
           rel="noopener noreferrer"
@@ -75,7 +90,7 @@ export default function HelpAndSupportButton() {
         >
           <div className={"flex gap-3 items-center"}>
             <BookText size={14} />
-            NetBird documentation
+            NetBird technical reference
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />

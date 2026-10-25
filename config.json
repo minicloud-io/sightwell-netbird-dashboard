@@ -25,5 +25,7 @@
   "hubspotOnboardingFormId": "$NETBIRD_HUBSPOT_ONBOARDING_FORM_ID",
   "hubspotSurveyFormId": "$NETBIRD_HUBSPOT_SURVEY_FORM_ID",
   "analyticsExcludedEmails": "$NETBIRD_ANALYTICS_EXCLUDED_EMAILS",
-  "announcement": "$NETBIRD_ANNOUNCEMENT"
+  "announcement": "$NETBIRD_ANNOUNCEMENT",
+  "sightwellDocsUrl": "$SIGHTWELL_DOCS_URL",
+  "sightwellHideIntegrations": "$SIGHTWELL_HIDE_INTEGRATIONS"
 }
