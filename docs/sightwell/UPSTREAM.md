@@ -56,6 +56,7 @@ record together with git history):
 | `build.sh` | image name, `SIGHTWELL_REVISION`, writes `out/third-party-licenses.txt` |
 | `docker/Dockerfile.ubi` | image labels |
 | `docker/README.md`, `README.md` | fork notice prepended |
+| `package.json`, `package-lock.json` | security bumps on 2026-10-25 (Dependabot critical/high on the fork): `next` 16.3.4 → 16.4.3, `eslint-config-next` 16.3.0 → 16.4.3, `storybook` and `@storybook/nextjs-vite` 10.6.1 → 10.6.3, `vitest` 4.1.10 → 4.1.12 (for `@vitest/mocker`), transitive `undici` → 7.30.1, `brace-expansion` → 5.0.12, `source-map-js` → 1.2.2, `ip-address` 10.2 → 10.7.5. Build, unit tests and a Storybook build pass; upstream will carry its own bumps, so expect these lines to conflict on the next sync and take upstream's versions when they are at least as new |
 
 Added files:
 

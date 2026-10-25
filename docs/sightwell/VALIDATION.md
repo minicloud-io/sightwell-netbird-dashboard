@@ -100,6 +100,22 @@ Judgement, following `.storybook/visual-regression/CLAUDE.md`:
 The full report is `.storybook/visual-regression/output/report.html` (not
 committed; the folder is git-ignored).
 
+## Dependency security bumps (2026-10-25)
+
+Dependabot on the fork reported 3 critical and 3 high alerts, all in
+`package-lock.json` and all inherited from upstream `v2.95.0`: `next`
+(GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr, GHSA-p3m5-59mp-jv5r), `storybook`
+(GHSA-f2ph-cmg5-wxc8, GHSA-px85-f4q5-jh77) and `undici` (GHSA-xjj6-f33q-929c),
+plus two medium ones in `@vitest/mocker`. The patched versions listed in
+`UPSTREAM.md` were installed; `npm audit` additionally flagged
+`brace-expansion` (high, dev), `source-map-js` (high, build) and
+`ip-address` (moderate, runtime), which were bumped too. Left open:
+`postcss-selector-parser` (moderate, build-time only), whose fix needs
+Tailwind 4, a breaking change that belongs to upstream. After the bumps: `npm run build` compiles, `npm run test:unit`
+907/907, `npx tsc --noEmit` clean, `npx storybook build` produces all 687
+stories. Not re-run after the bumps: the full visual regression pass and the
+e2e suite.
+
 ## Known limitations and pre-existing issues
 
 - **Light theme** (upstream): only the header and sidebar are styled for
