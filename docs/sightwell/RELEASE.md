@@ -3,7 +3,13 @@
 ## Versioning
 
 - Fork tags: `v<upstream>-sightwell.<n>`, e.g. `v2.95.0-sightwell.1`. The
-  upstream part names the baseline; `n` counts fork releases on it.
+  upstream part names the baseline; `n` counts fork releases on it. The
+  scheduled sync (below) creates these tags itself; a manual release is
+  `git tag -a v2.95.0-sightwell.2 -m "…" && git push origin v2.95.0-sightwell.2`
+  from the reviewed commit on `main`.
+- `main` is the release line: baseline release plus the branding. It is not
+  tracking upstream `main`; the sync moves it from release tag to release
+  tag.
 - `NEXT_PUBLIC_DASHBOARD_VERSION` is set from the tag by CI (upstream's
   mechanism) and shown in the sidebar and on About.
 - `SIGHTWELL_REVISION` is the commit; the About page and footer link
@@ -48,9 +54,30 @@ gh workflow disable build_and_push.yml --repo minicloud-io/sightwell-netbird-das
 gh workflow disable sync-deploy-templates.yml --repo minicloud-io/sightwell-netbird-dashboard
 ```
 
-Re-check after each upstream merge. A tag pushed from the feature branch
-runs `sightwell-image.yml` from that tag without merging to `main` first,
-which is the way to trial the pipeline (use a `-rc` tag).
+Re-check after each upstream merge. A tag pushed from a feature branch runs
+`sightwell-image.yml` from that tag without merging to `main` first, which
+is the way to trial the pipeline (use a `-rc` tag).
+
+## Staying current with upstream
+
+`.github/workflows/sightwell-sync-upstream.yml` runs every Monday 05:17 UTC
+and on demand (optionally with a specific upstream tag). When upstream has a
+release newer than `UPSTREAM.baselineTag` in `src/branding/brand.ts` it:
+
+1. merges that release tag into `main` on a `sync/upstream-<tag>` branch;
+2. rewrites the baseline tag and commit in `brand.ts` and the table in
+   `UPSTREAM.md`, in one commit;
+3. runs `npm ci`, `npm run build` and `npm run test:unit`;
+4. on success pushes `main`, tags `v<tag>-sightwell.<n>` and dispatches the
+   image workflow on the tag, which publishes the images and the release.
+
+On a merge conflict it aborts and opens an issue listing the conflicting
+files; on a failed build or test it pushes the sync branch and opens an
+issue with the run link. Nothing reaches `main` in either case. The sync
+does not judge visual changes: after each automated release, run
+`BASE_REF=<previous fork tag> npm run test:visual` and look at the branded
+surfaces (`BRANDING.md` inventory) before pointing a deployment at the new
+digest. Both workflows need only the repository `GITHUB_TOKEN`.
 
 Locally, `./build.sh` (`IMAGE_TAG=v2.95.0-sightwell.1 ./build.sh`) builds
 `out/`, writes `out/third-party-licenses.txt`, builds the amd64 image and

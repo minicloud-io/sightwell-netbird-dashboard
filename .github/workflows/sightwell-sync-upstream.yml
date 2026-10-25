@@ -1,0 +1,187 @@
+# Fork-specific (Sightwell Connectivity): keeps the fork on NetBird's latest
+# dashboard release.
+#
+# Every Monday (and on demand) it fetches upstream's tags, and when a release
+# newer than the recorded baseline exists it
+#   1. merges that tag into main on a sync branch,
+#   2. updates the baseline recorded in src/branding/brand.ts and
+#      docs/sightwell/UPSTREAM.md,
+#   3. installs, builds and runs the unit tests,
+#   4. pushes the result to main, tags it v<upstream>-sightwell.<n> and
+#      dispatches the "Sightwell image" workflow on that tag, which publishes
+#      the images and the GitHub release.
+# A merge conflict or a failing build/test pushes the sync branch, opens an
+# issue with the details and stops; nothing reaches main until someone fixes
+# it. Visual changes are not judged here: review the branding after each
+# sync with `npm run test:visual` (docs/sightwell/UPSTREAM.md).
+name: Sightwell upstream sync
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Upstream tag to sync to (empty = latest release)"
+        type: string
+        default: ""
+
+concurrency:
+  group: sightwell-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write # push main, the sync branch and the release tag
+  issues: write # report conflicts and failures
+  actions: write # dispatch the image workflow
+
+env:
+  UPSTREAM: https://github.com/netbirdio/dashboard.git
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Git identity and upstream remote
+        run: |
+          git config user.name "sightwell-sync[bot]"
+          git config user.email "sightwell-sync@users.noreply.github.com"
+          git remote add upstream "$UPSTREAM"
+          # Upstream tags are v<major>.<minor>.<patch>; ours carry -sightwell.
+          git fetch --no-tags upstream '+refs/tags/v*:refs/tags/v*'
+          git fetch --tags origin
+
+      - name: Pick the release to sync to
+        id: pick
+        env:
+          REQUESTED: ${{ inputs.tag }}
+        run: |
+          current=$(sed -n 's/.*baselineTag: "\(v[^"]*\)".*/\1/p' src/branding/brand.ts)
+          if [[ -n "$REQUESTED" ]]; then
+            latest="$REQUESTED"
+          else
+            latest=$(git tag -l 'v*' | grep -v -- '-sightwell' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+          fi
+          git rev-parse -q --verify "${latest}^{commit}" >/dev/null || { echo "::error::tag $latest not found"; exit 1; }
+          commit=$(git rev-parse "${latest}^{commit}")
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest"   >> "$GITHUB_OUTPUT"
+          echo "commit=$commit"   >> "$GITHUB_OUTPUT"
+          if [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$current" && -z "$REQUESTED" ]]; then
+            echo "uptodate=true" >> "$GITHUB_OUTPUT"
+            echo "Baseline $current is the latest upstream release." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "uptodate=false" >> "$GITHUB_OUTPUT"
+            echo "Syncing $current → $latest ($commit)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Merge the upstream release
+        if: steps.pick.outputs.uptodate == 'false'
+        id: merge
+        env:
+          LATEST: ${{ steps.pick.outputs.latest }}
+        run: |
+          git switch -c "sync/upstream-${LATEST}"
+          if git merge --no-edit "$LATEST"; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+          else
+            git diff --name-only --diff-filter=U > conflicts.txt
+            git merge --abort
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open an issue for a merge conflict
+        if: steps.merge.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST: ${{ steps.pick.outputs.latest }}
+        run: |
+          title="Upstream ${LATEST} needs a manual merge"
+          if [[ -z "$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')" ]]; then
+            {
+              echo "The scheduled sync could not merge upstream tag \`${LATEST}\` into \`main\` cleanly."
+              echo
+              echo "Conflicting files:"
+              echo
+              sed 's/^/- `/; s/$/`/' conflicts.txt
+              echo
+              echo "Follow the upgrade procedure in docs/sightwell/UPSTREAM.md, then tag the result \`${LATEST}-sightwell.1\`."
+              echo
+              echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            } > issue.md
+            gh issue create --title "$title" --label ci --body-file issue.md || gh issue create --title "$title" --body-file issue.md
+          fi
+          echo "::error::merge conflict with ${LATEST}; issue opened"
+          exit 1
+
+      - name: Record the new baseline
+        if: steps.merge.outputs.conflict == 'false'
+        env:
+          LATEST: ${{ steps.pick.outputs.latest }}
+          COMMIT: ${{ steps.pick.outputs.commit }}
+        run: |
+          sed -i "s/baselineTag: \"v[^\"]*\"/baselineTag: \"${LATEST}\"/" src/branding/brand.ts
+          sed -i "s/baselineCommit: \"[0-9a-f]*\"/baselineCommit: \"${COMMIT}\"/" src/branding/brand.ts
+          sed -i "s/^| Tag | \`v[^\`]*\` |/| Tag | \`${LATEST}\` |/" docs/sightwell/UPSTREAM.md
+          sed -i "s/^| Commit | \`[0-9a-f]*\` |/| Commit | \`${COMMIT}\` |/" docs/sightwell/UPSTREAM.md
+          sed -i "s/^| Selected | [0-9-]* |/| Selected | $(date -u +%F) (automated sync) |/" docs/sightwell/UPSTREAM.md
+          git add src/branding/brand.ts docs/sightwell/UPSTREAM.md
+          git commit -m "chore: sync with upstream ${LATEST}" -m "Baseline ${LATEST} (${COMMIT}), merged by the scheduled upstream sync."
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.merge.outputs.conflict == 'false'
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install, build and test
+        if: steps.merge.outputs.conflict == 'false'
+        id: check
+        env:
+          SIGHTWELL_REVISION: ${{ github.sha }}
+          SIGHTWELL_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          echo '{}' > .local-config.json
+          npm ci
+          npm run build
+          npm run test:unit
+
+      - name: Open an issue for a failed build or test
+        if: failure() && steps.check.conclusion == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST: ${{ steps.pick.outputs.latest }}
+        run: |
+          git push --force origin "HEAD:refs/heads/sync/upstream-${LATEST}"
+          title="Upstream ${LATEST} merged but build or unit tests fail"
+          if [[ -z "$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')" ]]; then
+            {
+              echo "Branch \`sync/upstream-${LATEST}\` holds the clean merge; \`npm run build\` or \`npm run test:unit\` failed on it."
+              echo
+              echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            } > issue.md
+            gh issue create --title "$title" --label ci --body-file issue.md || gh issue create --title "$title" --body-file issue.md
+          fi
+
+      - name: Push main, tag the release, build the images
+        if: steps.merge.outputs.conflict == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST: ${{ steps.pick.outputs.latest }}
+        run: |
+          n=$(( $(git tag -l "${LATEST}-sightwell.*" | wc -l) + 1 ))
+          tag="${LATEST}-sightwell.${n}"
+          git push origin HEAD:main
+          git tag -a "$tag" -m "Sightwell Connectivity dashboard ${tag} (upstream ${LATEST})"
+          git push origin "$tag"
+          # A tag pushed with GITHUB_TOKEN raises no push event, so the image
+          # workflow is dispatched on the tag explicitly.
+          gh workflow run sightwell-image.yml --ref "$tag" -f push=true
+          {
+            echo "Pushed \`main\` and tagged \`${tag}\`; the Sightwell image workflow was dispatched on the tag."
+          } >> "$GITHUB_STEP_SUMMARY"
