@@ -48,17 +48,16 @@ files to keep the diff small. Doing so is a 20-line change in
 
 ## Remaining work
 
-1. **Approve the public fork** `minicloud-io/sightwell-netbird-dashboard`
-   (a fork of a public repository is public). Then, from the clone:
-   ```bash
-   gh auth status
-   gh repo fork netbirdio/dashboard --org minicloud-io --fork-name sightwell-netbird-dashboard --clone=false --remote=false
-   git remote add origin https://github.com/minicloud-io/sightwell-netbird-dashboard.git
-   gh repo set-default minicloud-io/sightwell-netbird-dashboard
-   git push -u origin feat/sightwell-branding
-   ```
-   Never push to `netbirdio/dashboard`; `upstream` is fetch-only by use.
-2. **Review the commit** on `feat/sightwell-branding` (one local commit on top of `v2.95.0`, not pushed).
+1. **Fork and branch are up.** The public fork
+   `https://github.com/minicloud-io/sightwell-netbird-dashboard` was created
+   on 2026-10-25 with `gh repo fork netbirdio/dashboard --org minicloud-io
+   --fork-name sightwell-netbird-dashboard --clone=false` (this `gh` rejects
+   `--remote=false` together with a repository argument), `origin` points at
+   it, `upstream` is fetch-only (`git remote set-url --push upstream no_push`)
+   and `feat/sightwell-branding` is pushed. Never push to `netbirdio/dashboard`.
+2. **Review the branch** on the fork (one commit on top of `v2.95.0`); open a
+   pull request against the fork's own `main` when it is accepted, never
+   against upstream.
 3. **Read the running dashboard digest** from the cluster and record it in
    `RELEASE.md` as the rollback target.
 4. **Design review** of the screenshots in both themes; decide on the
