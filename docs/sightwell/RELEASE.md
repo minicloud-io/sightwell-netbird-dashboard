@@ -30,10 +30,21 @@ The images carry OCI labels from `docker/metadata-action`
 Sightwell title, vendor and licence labels. It needs no secrets beyond the
 workflow's `GITHUB_TOKEN` (`packages: write`, `contents: write`).
 
-Upstream's `build_and_push.yml` is kept unchanged for easy upgrades and
-**disabled in the fork's Actions** (it publishes NetBird's images with
-NetBird's secrets); `sync-deploy-templates.yml` is disabled for the same
-reason. Re-check that after each upstream merge: `gh workflow list`.
+Upstream's `build_and_push.yml` is kept unchanged for easy upgrades but
+must stay **disabled in the fork's Actions** (it publishes NetBird's images
+with NetBird's secrets), as must `sync-deploy-templates.yml`. GitHub only
+registers a fork's workflows once Actions first runs them, so disable both
+right after the first push to `main` (or the first time they show up in
+`gh workflow list --repo minicloud-io/sightwell-netbird-dashboard`):
+
+```bash
+gh workflow disable build_and_push.yml --repo minicloud-io/sightwell-netbird-dashboard
+gh workflow disable sync-deploy-templates.yml --repo minicloud-io/sightwell-netbird-dashboard
+```
+
+Re-check after each upstream merge. A tag pushed from the feature branch
+runs `sightwell-image.yml` from that tag without merging to `main` first,
+which is the way to trial the pipeline (use a `-rc` tag).
 
 Locally, `./build.sh` (`IMAGE_TAG=v2.95.0-sightwell.1 ./build.sh`) builds
 `out/`, writes `out/third-party-licenses.txt`, builds the amd64 image and

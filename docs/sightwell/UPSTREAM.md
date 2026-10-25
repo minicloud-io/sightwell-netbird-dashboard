@@ -95,6 +95,7 @@ config, `config.json` and `init_react_envs.sh` are upstream's.
 Upstream workflows that assume NetBird's infrastructure (`build_and_push.yml`,
 `bump-netbird.yml`, `sync-deploy-templates.yml`, `e2e-test.yml`,
 `docs-ack.yml`) are untouched; they fail or do nothing without NetBird's
-secrets. `build_and_push.yml` and `sync-deploy-templates.yml` are disabled in
-the fork's Actions settings (not deleted, to keep the diff small); the fork
-builds images with `sightwell-image.yml`.
+secrets. `build_and_push.yml` and `sync-deploy-templates.yml` must be
+disabled in the fork's Actions settings as soon as GitHub registers them
+(see `RELEASE.md`; not deleted, to keep the diff small); the fork builds
+images with `sightwell-image.yml`.
