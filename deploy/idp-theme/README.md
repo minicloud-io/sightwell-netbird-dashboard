@@ -51,7 +51,7 @@ server:
 
 The server validates the directory at start-up (it must contain
 `templates/header.html`, `footer.html`, `login.html`, `logout.html`,
-`password.html`, `error.html`, plus `static/` and `themes/sightwell/`), which this
+`password.html`, `error.html`, plus `static/`, `themes/sightwell/` and the `robots.txt` file), which this
 directory does. Without the block, or with the upstream image, NetBird's
 own pages are served as before. The alternative that needs no server
 change remains signing in through the external identity provider directly
@@ -60,30 +60,39 @@ embedded IdP's local "Continue with Email" users.
 
 ## Mounting on Kubernetes
 
-The theme is plain files; a ConfigMap per folder keeps each under the 1 MiB
-limit (the favicon is binary, `--from-file` handles it):
-
-```bash
-kubectl -n <namespace> create configmap sightwell-idp-templates --from-file=deploy/idp-theme/templates
-kubectl -n <namespace> create configmap sightwell-idp-theme     --from-file=deploy/idp-theme/themes/sightwell
-kubectl -n <namespace> create configmap sightwell-idp-static    --from-file=deploy/idp-theme/static --from-file=deploy/idp-theme/robots.txt
-```
+Dex expects one directory with `templates/`, `static/`, `themes/<name>/` and
+a `robots.txt` **file** next to them, and refuses to start if any is missing.
+The Helm chart in `deploy/helm/sightwell-connectivity` does this with one
+**projected volume** that lays three ConfigMaps out in exactly that shape
+(see its `server-deployment.yaml`); prefer that over hand-written mounts.
+If you mount by hand, avoid a `subPath` file mount for `robots.txt`: whether
+it becomes a file or a directory depends on kubelet ordering, and a
+directory there crash-loops the server. Put `robots.txt` in the same
+ConfigMap as `static/` and project it:
 
 ```yaml
 volumes:
-  - { name: idp-templates, configMap: { name: sightwell-idp-templates } }
-  - { name: idp-theme,     configMap: { name: sightwell-idp-theme } }
-  - { name: idp-static,    configMap: { name: sightwell-idp-static } }
+  - name: idp-theme
+    projected:
+      sources:
+        - configMap:
+            name: sightwell-idp-templates   # created with --from-file=deploy/idp-theme/templates
+            items: [{ key: header.html, path: templates/header.html }, … one per template …]
+        - configMap:
+            name: sightwell-idp-static      # --from-file=deploy/idp-theme/static --from-file=deploy/idp-theme/robots.txt
+            items: [{ key: main.css, path: static/main.css }, { key: robots.txt, path: robots.txt }]
+        - configMap:
+            name: sightwell-idp-theme       # --from-file=deploy/idp-theme/themes/sightwell
+            items: [{ key: favicon.svg, path: themes/sightwell/favicon.svg }, … one per file …]
 containers:
   - name: netbird-server
     volumeMounts:
-      - { name: idp-templates, mountPath: /etc/netbird/idp-theme/templates, readOnly: true }
-      - { name: idp-theme,     mountPath: /etc/netbird/idp-theme/themes/sightwell, readOnly: true }
-      - { name: idp-static,    mountPath: /etc/netbird/idp-theme/static, readOnly: true }
+      - { name: idp-theme, mountPath: /etc/netbird/idp-theme, readOnly: true }
 ```
 
-`robots.txt` ends up under `static/`; Dex serves it from `Dir/robots.txt`,
-so either mount it there separately or accept the default.
+The server (fork image `v0.81.4-sightwell.3` or later) validates the directory
+at start-up and names the missing piece, so a wrong mount fails fast with a
+readable log line instead of a Dex error.
 
 ## Keeping it in step with upstream
 

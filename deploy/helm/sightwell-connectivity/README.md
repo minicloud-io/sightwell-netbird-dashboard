@@ -67,8 +67,11 @@ mounts.
   derived from `domain`; local STUN off, since an HTTP ingress cannot carry
   UDP; `server.extraConfig` merged verbatim).
 - `ConfigMaps <release>-idp-templates / -idp-static / -idp-theme`: the
-  Sightwell theme from `files/idp-theme`, mounted at
-  `/etc/netbird/idp-theme` and switched on with `server.auth.theme`.
+  Sightwell theme from `files/idp-theme`. They are combined by **one
+  projected volume** into `/etc/netbird/idp-theme` with the layout Dex
+  expects (`templates/`, `static/`, `themes/<name>/`, `robots.txt`), so
+  there is no file-level `subPath` mount that could land on a directory.
+  Switched on with `server.auth.theme`.
 - `Deployment <release>-server` (1 replica, `Recreate`, PVC for
   `/var/lib/netbird`) and `Service`.
 - `Deployment <release>-dashboard` (rootless image, UID 10001) and
@@ -84,8 +87,10 @@ mounts.
 ## Theme files
 
 `files/idp-theme` is a copy of `deploy/idp-theme`; run `../sync-theme.sh`
-after changing the theme. The server refuses to start if the mounted
-directory lacks a required template, `static/` or `themes/<name>/`.
+after changing the theme. The server refuses to start, naming the item, if
+the mounted directory lacks a required template, `static/`, `themes/<name>/`
+or the `robots.txt` file (all of which Dex itself needs). Check a mount
+from inside the pod with `kubectl exec <server pod> -- ls -R /etc/netbird/idp-theme`.
 
 ## Upgrades and rollback
 

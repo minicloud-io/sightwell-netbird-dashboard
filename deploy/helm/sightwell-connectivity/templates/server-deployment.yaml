@@ -52,11 +52,10 @@ spec:
             - { name: config, mountPath: /etc/netbird/config.yaml, subPath: config.yaml, readOnly: true }
             - { name: data, mountPath: /var/lib/netbird }
             {{- if .Values.server.auth.theme.enabled }}
-            {{- $mp := .Values.server.auth.theme.mountPath }}
-            - { name: idp-templates, mountPath: {{ printf "%s/templates" $mp | quote }}, readOnly: true }
-            - { name: idp-static, mountPath: {{ printf "%s/static" $mp | quote }}, readOnly: true }
-            - { name: idp-static, mountPath: {{ printf "%s/robots.txt" $mp | quote }}, subPath: robots.txt, readOnly: true }
-            - { name: idp-theme, mountPath: {{ printf "%s/themes/%s" $mp .Values.server.auth.theme.name | quote }}, readOnly: true }
+            # One mount for the whole theme: a projected volume lays the three
+            # ConfigMaps out as templates/, static/, themes/<name>/ and robots.txt
+            # under a single directory, so no file-level (subPath) mount is needed.
+            - { name: idp-theme, mountPath: {{ .Values.server.auth.theme.mountPath | quote }}, readOnly: true }
             {{- end }}
       volumes:
         - name: config
@@ -70,9 +69,29 @@ spec:
           emptyDir: {}
           {{- end }}
         {{- if .Values.server.auth.theme.enabled }}
-        - { name: idp-templates, configMap: { name: {{ include "sc.fullname" . }}-idp-templates } }
-        - { name: idp-static, configMap: { name: {{ include "sc.fullname" . }}-idp-static } }
-        - { name: idp-theme, configMap: { name: {{ include "sc.fullname" . }}-idp-theme } }
+        {{- $full := include "sc.fullname" . }}
+        {{- $theme := .Values.server.auth.theme.name }}
+        - name: idp-theme
+          projected:
+            defaultMode: 0444
+            sources:
+              - configMap:
+                  name: {{ $full }}-idp-templates
+                  items:
+                    {{- range $path, $_ := .Files.Glob "files/idp-theme/templates/*.html" }}
+                    - { key: {{ base $path | quote }}, path: {{ printf "templates/%s" (base $path) | quote }} }
+                    {{- end }}
+              - configMap:
+                  name: {{ $full }}-idp-static
+                  items:
+                    - { key: main.css, path: static/main.css }
+                    - { key: robots.txt, path: robots.txt }
+              - configMap:
+                  name: {{ $full }}-idp-theme
+                  items:
+                    {{- range $path, $_ := .Files.Glob "files/idp-theme/themes/sightwell/*" }}
+                    - { key: {{ base $path | quote }}, path: {{ printf "themes/%s/%s" $theme (base $path) | quote }} }
+                    {{- end }}
         {{- end }}
       {{- with .Values.server.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
