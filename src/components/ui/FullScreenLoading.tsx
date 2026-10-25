@@ -1,9 +1,10 @@
 import { cn } from "@utils/helpers";
-import LoadingIcon from "@/assets/icons/LoadingIcon";
+import BrandSpinner from "@/branding/BrandSpinner";
 
 type Props = {
   fullScreen?: boolean;
 };
+// Fork-specific: the Sightwell spinner instead of upstream's LoadingIcon bars.
 export default function FullScreenLoading({ fullScreen = true }: Props) {
   return (
     <div
@@ -12,7 +13,7 @@ export default function FullScreenLoading({ fullScreen = true }: Props) {
         fullScreen && "h-screen",
       )}
     >
-      <LoadingIcon className="fill-netbird" size={44} />
+      <BrandSpinner size={44} />
     </div>
   );
 }

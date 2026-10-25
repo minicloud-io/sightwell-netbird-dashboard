@@ -108,6 +108,8 @@ not done.
 | About page | `src/app/(dashboard)/about/` | new: identity, build, AGPL offer, help |
 | Source offer footer | `src/branding/BrandFooter.tsx` | setup wizard, invite, session lost, OIDC error, error page, pending approval |
 | Copy | `error/page.tsx`, `invite/page.tsx`, `InstanceSetupWizard.tsx`, `PendingApproval.tsx` | "Welcome to Sightwell Connectivity", "account administrator", no NetBird support desk link |
+| Loading | `src/components/ui/FullScreenLoading.tsx` → `src/branding/BrandSpinner.tsx` | Sightwell mark with a turning signal-orange arc instead of upstream's bouncing bars; stops under reduced motion |
+| Sign-in, sign-out, password, device and error pages | **NetBird server (embedded Dex)**, not the dashboard | themed in `deploy/idp-theme/`; activation needs an upstream server change (see its README) |
 | Primary button | `src/components/Button.tsx` | ink text on orange |
 | Palette | `tailwind.config.ts` | see Tokens |
 | Image metadata | `docker/Dockerfile.ubi`, `sightwell-image.yml` labels | Sightwell names; AGPL and third-party notices unchanged |

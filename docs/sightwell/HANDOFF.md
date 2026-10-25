@@ -77,8 +77,8 @@ branding:
 
 | Page | Owner | Status |
 | --- | --- | --- |
-| Loading / redirect while the OIDC flow runs (`FullScreenLoading`) | dashboard | spinner now brand orange; no logo by design (sub-second) |
-| Sign-in form | **NetBird server's embedded IdP** (`netbirdio/netbird-server`, Dex-based "embedded identity provider" in this deployment) or the customer's external IdP (`AUTH_AUTHORITY`) | **not changed**; a mockup here would not change the real page |
+| Loading / redirect while the OIDC flow runs (`FullScreenLoading`) | dashboard | branded: Sightwell mark with a turning orange arc (`BrandSpinner`) |
+| Sign-in, email/password, sign-out ("Logged Out"), device, error pages | **NetBird server's embedded IdP (Dex)** or the customer's external IdP (`AUTH_AUTHORITY`) | themed in `deploy/idp-theme/`, **not active**: the management server hard-codes the Dex frontend; see the README there for the upstream change and the interim options |
 | Session expired, OIDC error, access error / blocked / pending approval | dashboard | branded |
 | Instance setup wizard (`/setup`, first admin) | dashboard | branded |
 | Invite acceptance (`/invite?token=`) | dashboard | branded |
@@ -87,8 +87,9 @@ branding:
 
 ### Visual specification for the externally owned sign-in page
 
-To be applied by whoever owns the IdP page (NetBird server's embedded IdP
-theme, or the external IdP's branding settings). It mirrors the existing
+Implemented as ready-to-mount templates in `deploy/idp-theme/` for the
+embedded IdP (previews: `screenshots/after/idp-*.png`); for an external IdP
+apply the same values in its branding settings. It mirrors the existing
 Sightwell console sign-in template
 (`KeyBeyond.Infrastructure.Supabase/modules/oauth2_proxy_studio/templates/sightwell-sign_in.html`),
 so the two sign-in experiences match:

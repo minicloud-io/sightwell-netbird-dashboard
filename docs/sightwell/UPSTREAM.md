@@ -52,6 +52,7 @@ record together with git history):
 | `src/auth/SessionLost.tsx`, `src/auth/OIDCError.tsx`, `src/app/error/page.tsx`, `src/app/invite/page.tsx` | `BrandIcon`, `BrandFooter`, copy |
 | `src/modules/instance-setup/InstanceSetupWizard.tsx` | welcome copy, footer |
 | `src/modules/users/PendingApproval.tsx` | support link replaced, footer |
+| `src/components/ui/FullScreenLoading.tsx` | renders `BrandSpinner` instead of `LoadingIcon` |
 | `src/app/PublicPages.stories.tsx` | expected welcome text |
 | `build.sh` | image name, `SIGHTWELL_REVISION`, writes `out/third-party-licenses.txt` |
 | `docker/Dockerfile.ubi` | image labels |
@@ -63,7 +64,8 @@ Added files:
 | File | Purpose |
 | --- | --- |
 | `src/branding/brand.ts` (+ `brand.test.ts`) | identity, upstream record, URL helpers |
-| `src/branding/BrandLogo.tsx`, `BrandIcon.tsx`, `BrandFooter.tsx`, `Branding.stories.tsx` | components |
+| `src/branding/BrandLogo.tsx`, `BrandIcon.tsx`, `BrandFooter.tsx`, `BrandSpinner.tsx`, `Branding.stories.tsx` | components |
+| `deploy/idp-theme/*` | Sightwell theme for the NetBird server's embedded identity provider (templates derived from netbirdio/netbird, BSD-3-Clause) |
 | `src/assets/sightwell/*` (+ `README.md`) | brand SVGs |
 | `src/app/icon.svg` | SVG favicon |
 | `src/app/(dashboard)/about/{layout,page}.tsx`, `About.stories.tsx` | About page |

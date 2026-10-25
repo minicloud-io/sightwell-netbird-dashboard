@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import BrandFooter from "@/branding/BrandFooter";
 import BrandIcon from "@/branding/BrandIcon";
 import { BrandLogo, ModuleBadge } from "@/branding/BrandLogo";
+import BrandSpinner from "@/branding/BrandSpinner";
 import { padded, Row, Stack } from "@/storybook/components";
 
 /* Fork-specific: the Sightwell identity pieces in both themes. */
@@ -35,6 +36,21 @@ export const Logo: StoryObj = {
         <BrandIcon size={24} />
         <BrandIcon size={32} />
         <BrandIcon size={48} />
+      </Row>
+    </Stack>
+  ),
+};
+
+export const Spinner: StoryObj = {
+  render: () => (
+    <Stack>
+      <Row label={"page"}>
+        <BrandSpinner size={44} />
+      </Row>
+      <Row label={"sizes"}>
+        <BrandSpinner size={20} />
+        <BrandSpinner size={32} />
+        <BrandSpinner size={64} />
       </Row>
     </Stack>
   ),

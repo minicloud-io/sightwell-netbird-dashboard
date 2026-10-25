@@ -116,6 +116,17 @@ Tailwind 4, a breaking change that belongs to upstream. After the bumps: `npm ru
 stories. Not re-run after the bumps: the full visual regression pass and the
 e2e suite.
 
+## Loading spinner and identity-provider theme (2026-10-25)
+
+- `BrandSpinner` replaces the bouncing bars in `FullScreenLoading`; checked in
+  Storybook (`Components/Branding / Spinner`, `Components/UI/EmptyStates /
+  Loading`), type check and lint clean, unit tests unchanged (907).
+- `deploy/idp-theme/` was rendered with hand-filled template variables and
+  screenshotted (`idp-login`, `idp-logout`, `idp-password-error`, dark and
+  light). **Not served by a running Dex** and **not activatable** with the
+  current NetBird server (its README explains why and what upstream change
+  is needed).
+
 ## Known limitations and pre-existing issues
 
 - **Light theme** (upstream): only the header and sidebar are styled for
