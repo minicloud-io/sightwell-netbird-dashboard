@@ -25,70 +25,40 @@ inline outlined SVG). Provider icons (Entra ID, Google, Okta, …) are
 upstream's data URIs, kept verbatim. Previews rendered from these templates:
 `docs/sightwell/screenshots/after/idp-*.png`.
 
-## Status: ready, but not switchable on today
+## Status: switched on through the Sightwell server fork
 
 Dex loads a custom web directory when its `frontend.dir` is set, and
 NetBird's Dex wrapper passes that through
-(`idp/dex/config.go`, `ToServerConfig`: `Dir: c.Frontend.Dir`, falling back
-to the embedded files only when it is empty). The management server,
-however, builds that config itself from `management.json`'s `EmbeddedIdP`
-section and hard-codes the frontend
-(`management/server/idp/embedded.go`, `ToYAMLConfig`:
-`Frontend: dex.Frontend{Issuer: "NetBird", Theme: "light"}`), with no field
-to set a directory. So with the current `netbirdio/netbird-server` image
-**there is no configuration that activates this theme**. The server is out
-of scope for this fork and is not modified here.
+(`idp/dex/config.go`, `ToServerConfig`). The upstream management server
+never exposes it: `management/server/idp/embedded.go` hard-codes
+`Frontend{Issuer: "NetBird", Theme: "light"}`. So with the official
+`netbirdio/netbird-server` image this theme cannot be activated.
 
-### The upstream change that would enable it
+The Sightwell server fork, `minicloud-io/sightwell-netbird-server` (branch
+`feat/idp-theme` on upstream `v0.81.4`), adds the missing plumbing as a
+`server.auth.theme` block; see `docs/sightwell/README.md` there. With a
+server image built from that fork:
 
-A small, backwards-compatible addition to `EmbeddedIdPConfig` (the exact
-field names are a proposal for the pull request):
-
-```go
-// management/server/idp/embedded.go
-type EmbeddedIdPConfig struct {
-    // …existing fields…
-    // Frontend overrides the look of the sign-in pages. Empty keeps NetBird's.
-    Frontend *EmbeddedIdPFrontend `json:"Frontend,omitempty"`
-}
-
-type EmbeddedIdPFrontend struct {
-    Dir     string `json:"Dir"`     // directory with templates/, static/, themes/
-    Theme   string `json:"Theme"`   // theme folder under Dir/themes (default "light")
-    Issuer  string `json:"Issuer"`  // page title / issuer name (default "NetBird")
-    LogoURL string `json:"LogoURL"` // optional logo URL for themes that use it
-}
-
-// in ToYAMLConfig():
-frontend := dex.Frontend{Issuer: "NetBird", Theme: "light"}
-if c.Frontend != nil {
-    if c.Frontend.Dir != ""     { frontend.Dir = c.Frontend.Dir }
-    if c.Frontend.Theme != ""   { frontend.Theme = c.Frontend.Theme }
-    if c.Frontend.Issuer != ""  { frontend.Issuer = c.Frontend.Issuer }
-    if c.Frontend.LogoURL != "" { frontend.LogoURL = c.Frontend.LogoURL }
-}
-cfg.Frontend = frontend
+```yaml
+server:
+  auth:
+    issuer: "https://connectivity.example.internal/oauth2"
+    theme:
+      dir: /etc/netbird/idp-theme
+      name: sightwell
+      displayName: "Sightwell Connectivity"
 ```
 
-Dex already validates and serves the directory; nothing else changes. With
-that merged, `management.json` gains:
+The server validates the directory at start-up (it must contain
+`templates/header.html`, `footer.html`, `login.html`, `logout.html`,
+`password.html`, `error.html` and `themes/sightwell/`), which this
+directory does. Without the block, or with the upstream image, NetBird's
+own pages are served as before. The alternative that needs no server
+change remains signing in through the external identity provider directly
+(dashboard `AUTH_AUTHORITY` pointed at Entra ID), at the cost of the
+embedded IdP's local "Continue with Email" users.
 
-```json
-"EmbeddedIdP": {
-  "Enabled": true,
-  "Issuer": "https://connectivity.example.internal/oauth2",
-  "Frontend": { "Dir": "/etc/netbird/idp-theme", "Theme": "sightwell", "Issuer": "Sightwell Connectivity" }
-}
-```
-
-Until then the choices are: (a) submit that pull request upstream and wait
-for a release, (b) run a patched server build, which this project has
-decided against, or (c) sign in through the external identity provider
-directly (set the dashboard's `AUTH_AUTHORITY` to Entra ID) so the Dex page
-is never shown, at the cost of the embedded IdP's local "Continue with
-Email" users.
-
-## Mounting on Kubernetes (once the server supports it)
+## Mounting on Kubernetes
 
 The theme is plain files; a ConfigMap per folder keeps each under the 1 MiB
 limit (the favicon is binary, `--from-file` handles it):

@@ -78,7 +78,7 @@ branding:
 | Page | Owner | Status |
 | --- | --- | --- |
 | Loading / redirect while the OIDC flow runs (`FullScreenLoading`) | dashboard | branded: Sightwell mark with a turning orange arc (`BrandSpinner`) |
-| Sign-in, email/password, sign-out ("Logged Out"), device, error pages | **NetBird server's embedded IdP (Dex)** or the customer's external IdP (`AUTH_AUTHORITY`) | themed in `deploy/idp-theme/`, **not active**: the management server hard-codes the Dex frontend; see the README there for the upstream change and the interim options |
+| Sign-in, email/password, sign-out ("Logged Out"), device, error pages | **NetBird server's embedded IdP (Dex)** or the customer's external IdP (`AUTH_AUTHORITY`) | themed in `deploy/idp-theme/`; activated by the `server.auth.theme` block of the Sightwell server fork `minicloud-io/sightwell-netbird-server` (upstream's server hard-codes the Dex frontend) |
 | Session expired, OIDC error, access error / blocked / pending approval | dashboard | branded |
 | Instance setup wizard (`/setup`, first admin) | dashboard | branded |
 | Invite acceptance (`/invite?token=`) | dashboard | branded |
