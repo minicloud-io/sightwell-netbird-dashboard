@@ -1,10 +1,10 @@
 import { globalMetaTitle } from "@utils/meta";
 import type { Metadata } from "next";
+import { BRAND } from "@/branding/brand";
 import AppLayout from "@/layouts/AppLayout";
 
 export const metadata: Metadata = {
   title: `${globalMetaTitle}`,
-  description:
-    "NetBird combines a configuration-free peer-to-peer private network and a centralized access control system in a single open-source platform",
+  description: BRAND.description,
 };
 export default AppLayout;

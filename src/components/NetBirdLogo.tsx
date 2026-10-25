@@ -1,42 +1,22 @@
-import { cn } from "@utils/helpers";
-import Image from "next/image";
 import * as React from "react";
-import NetBirdLogoMark from "@/assets/netbird.svg";
-import NetBirdLogoFull from "@/assets/netbird-full.svg";
+import { BrandLogo } from "@/branding/BrandLogo";
+
+/*
+ * Fork-specific (Sightwell Connectivity): upstream's product lockup is the
+ * NetBird logo. Every place that shows the *product's* identity (header,
+ * setup wizard, onboarding, pending approval) imports this component, so it
+ * now renders the Sightwell lockup with the same props. Keeping the file and
+ * its API means the upstream call sites need no change on an upgrade.
+ *
+ * Where the NetBird bird marks the NetBird client or server itself, the
+ * NetBirdIcon in src/assets/icons stays untouched.
+ */
 
 type Props = {
   size?: "default" | "large";
   mobile?: boolean;
 };
 
-const sizes = {
-  default: {
-    desktop: 22,
-    mobile: 30,
-  },
-  large: {
-    desktop: 24,
-    mobile: 40,
-  },
-};
-
-export const NetBirdLogo = ({ size = "default", mobile = true }: Props) => {
-  return (
-    <>
-      <Image
-        src={NetBirdLogoFull}
-        height={sizes[size].desktop}
-        alt={"NetBird Logo"}
-        className={cn(mobile && "hidden md:block")}
-      />
-      {mobile && (
-        <Image
-          src={NetBirdLogoMark}
-          width={sizes[size].mobile}
-          alt={"NetBird Logo"}
-          className={cn(mobile && "md:hidden ml-4")}
-        />
-      )}
-    </>
-  );
-};
+export const NetBirdLogo = ({ size = "default", mobile = true }: Props) => (
+  <BrandLogo size={size} mobile={mobile} />
+);

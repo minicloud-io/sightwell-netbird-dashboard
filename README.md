@@ -1,3 +1,26 @@
+# Sightwell Connectivity dashboard
+
+> **This is a fork.** It rebrands the self-hosted
+> [NetBird dashboard](https://github.com/netbirdio/dashboard) as
+> **Sightwell Connectivity**, the connectivity module of the Sightwell
+> platform (KeyBeyond). Only the presentation layer changes: product name,
+> logo, favicon, colour tokens, the help menu and an About / open-source
+> notices page. Workflows, routes, API contracts and authentication are
+> upstream's.
+>
+> - Baseline: upstream `v2.95.0` (`0d020d44a1d94135a6b71098ddb3efb1237f3b4d`)
+> - Licence: AGPL-3.0, unchanged ([LICENSE](./LICENSE)); modifications are
+>   listed in [docs/sightwell/UPSTREAM.md](./docs/sightwell/UPSTREAM.md) and
+>   summarised in [NOTICE.md](./NOTICE.md)
+> - Fork documentation: [docs/sightwell/](./docs/sightwell/)
+> - Sightwell is not affiliated with or endorsed by NetBird GmbH.
+>
+> The upstream README follows. Its commands, image names and links describe
+> the NetBird technology this fork runs on and still apply, except that this
+> fork's images are published under `ghcr.io/minicloud-io/`.
+
+---
+
 # NetBird Dashboard
 
 This project is the UI for NetBird's Management service.

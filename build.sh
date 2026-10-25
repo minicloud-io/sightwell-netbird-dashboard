@@ -18,7 +18,11 @@ set -euo pipefail
 # Always run relative to this script's directory (the project root).
 cd "$(dirname "$0")"
 
-IMAGE_NAME="${IMAGE_NAME:-netbird-dashboard}"
+# Fork-specific (Sightwell Connectivity): image name, fork revision and the
+# third-party notices file the About page links to.
+IMAGE_NAME="${IMAGE_NAME:-sightwell-netbird-dashboard}"
+SIGHTWELL_REVISION="${SIGHTWELL_REVISION:-$(git rev-parse HEAD 2>/dev/null || echo development)}"
+export SIGHTWELL_REVISION
 IMAGE_TAG="${IMAGE_TAG:-amd64}"
 DOCKERFILE="docker/Dockerfile"
 CONTAINER_PORT=80
@@ -49,8 +53,10 @@ if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
     echo "==> Installing dependencies (npm ci)"
     npm ci
   fi
-  echo "==> Building static export (next build) into out/"
+  echo "==> Building static export (next build) into out/ (revision ${SIGHTWELL_REVISION})"
   npx next build
+  echo "==> Writing third-party notices into out/"
+  node docker/third-party-licenses.mjs > out/third-party-licenses.txt
 fi
 
 if [[ ! -d out ]]; then

@@ -27,9 +27,11 @@ export const buttonVariants = cva(
           "bg-white hover:text-black focus:ring-zinc-200/50  hover:bg-gray-100 border-gray-200 text-gray-900",
           "dark:focus:ring-zinc-800/50 dark:bg-nb-gray dark:text-gray-400 dark:border-gray-700/30 dark:hover:text-white dark:hover:bg-zinc-800/50",
         ],
+        // Fork-specific (Sightwell): ink text on the signal-orange accent, as the
+        // brand buttons do; white on #F07A3A would fall short of AA contrast.
         primary: [
-          "dark:focus:ring-netbird-600/50 dark:ring-offset-neutral-950/50 enabled:dark:bg-netbird disabled:dark:bg-nb-gray-910 dark:text-gray-100 enabled:dark:hover:text-white enabled:dark:hover:bg-netbird-500/80",
-          "enabled:bg-netbird enabled:text-white enabled:focus:ring-netbird-400/50 enabled:hover:bg-netbird-500",
+          "dark:focus:ring-netbird-600/50 dark:ring-offset-neutral-950/50 enabled:dark:bg-netbird disabled:dark:bg-nb-gray-910 enabled:dark:text-nb-gray-950 enabled:dark:hover:text-nb-gray-950 enabled:dark:hover:bg-netbird-300",
+          "enabled:bg-netbird enabled:text-nb-gray-950 enabled:focus:ring-netbird-400/50 enabled:hover:bg-netbird-500",
         ],
         secondary: [
           "bg-white hover:text-black focus:ring-zinc-200/50 hover:bg-gray-100 border-gray-200 text-gray-900",

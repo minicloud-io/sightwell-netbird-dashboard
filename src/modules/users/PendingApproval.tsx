@@ -3,6 +3,7 @@
 import Button from "@components/Button";
 import InlineLink from "@components/InlineLink";
 import { NetBirdLogo } from "@components/NetBirdLogo";
+import BrandFooter from "@/branding/BrandFooter";
 import Paragraph from "@components/Paragraph";
 import Steps from "@components/Steps";
 import { cn } from "@utils/helpers";
@@ -117,14 +118,11 @@ export const PendingApproval = ({ error, onRefresh, onLogout }: Props) => {
         >
           Read the Docs
         </InlineLink>
-        or
-        <InlineLink
-          href={"https://docs.netbird.io/help/netbird-support"}
-          target={"_blank"}
-        >
-          Contact Support
-        </InlineLink>
+        or contact your administrator.
       </Paragraph>
+      {/* Fork-specific: NetBird's support desk does not cover this
+          deployment; the approver is the account owner named above. */}
+      <BrandFooter />
     </div>
   );
 };

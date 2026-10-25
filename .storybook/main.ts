@@ -32,10 +32,22 @@ function tsconfigAliases() {
 
 /* src/utils/config.ts loads its config with CommonJS require(), which Vite
    leaves untouched, so the calls are rewritten to import the mock config. */
+/* Fork-specific (Sightwell): the build ships with no remote announcements
+   feed, but the AnnouncementBanner stories drive the banner through that feed
+   (mocked in mocks/api.ts), so the brand module gets upstream's URL here. */
+const STORYBOOK_ANNOUNCEMENTS_URL =
+  "https://raw.githubusercontent.com/netbirdio/dashboard/main/announcements.json";
+
 const mockConfigPlugin = {
   name: "netbird-mock-config",
   enforce: "pre" as const,
   transform(code: string, id: string) {
+    if (id.endsWith("src/branding/brand.ts")) {
+      return code.replace(
+        "process.env.NEXT_PUBLIC_SIGHTWELL_ANNOUNCEMENTS_URL",
+        JSON.stringify(STORYBOOK_ANNOUNCEMENTS_URL),
+      );
+    }
     if (!id.endsWith("src/utils/config.ts")) return;
     const mock = JSON.stringify(path.join(root, ".storybook/mocks/config.ts"));
     return (

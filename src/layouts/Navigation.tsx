@@ -28,6 +28,7 @@ import { SmallBadge } from "@components/ui/SmallBadge";
 import * as React from "react";
 import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import ActivityIcon from "@/assets/icons/ActivityIcon";
+import { InfoIcon } from "lucide-react";
 
 type Props = {
   fullWidth?: boolean;
@@ -375,6 +376,15 @@ export default function Navigation({
                   href={"https://docs.netbird.io/"}
                   target={"_blank"}
                   label="Documentation"
+                  visible={true}
+                />
+                {/* Fork-specific: product identity, build info and the AGPL
+                    source offer for the signed-in dashboard. */}
+                <SidebarItem
+                  icon={<InfoIcon size={16} />}
+                  href={"/about"}
+                  label="About"
+                  exactPathMatch={true}
                   visible={true}
                 />
               </SidebarItemGroup>

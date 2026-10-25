@@ -6,6 +6,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ApiError, SetupRequest } from "@/interfaces/Instance";
 import { submitSetup } from "@/utils/unauthenticatedApi";
 import { NetBirdLogo } from "@components/NetBirdLogo";
+import { BRAND } from "@/branding/brand";
+import BrandFooter from "@/branding/BrandFooter";
 import Button from "@components/Button";
 import { Label } from "@components/Label";
 import { Input } from "@components/Input";
@@ -194,7 +196,7 @@ export default function InstanceSetupWizard() {
       </div>
       <Card className={"max-w-[420px] mt-8 mx-auto"}>
         <h1 className={"text-xl text-center z-10 relative"}>
-          Welcome to NetBird
+          Welcome to {BRAND.fullName}
         </h1>
         <div
           className={
@@ -285,12 +287,11 @@ export default function InstanceSetupWizard() {
         </form>
       </Card>
 
-      <div className={"flex items-center justify-center mt-6"}>
-        <span
-          className={"text-sm text-nb-gray-400 font-light pb-10 text-center"}
-        >
-          This is a one-time setup for your NetBird instance.
+      <div className={"flex flex-col items-center justify-center mt-6 gap-4"}>
+        <span className={"text-sm text-nb-gray-400 font-light text-center"}>
+          This is a one-time setup for this {BRAND.fullName} instance.
         </span>
+        <BrandFooter className={"pb-10"} />
       </div>
     </div>
   );

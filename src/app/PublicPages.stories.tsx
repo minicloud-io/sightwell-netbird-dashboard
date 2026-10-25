@@ -38,7 +38,7 @@ export const Setup: Story = {
     </InstanceSetupProvider>
   ),
   play: async () => {
-    await findText("Welcome to NetBird");
+    await findText("Welcome to Sightwell Connectivity");
     await settle();
   },
 };
@@ -47,7 +47,7 @@ export const SetupFilledPasswordMismatch: Story = {
   parameters: setup,
   render: Setup.render,
   play: async () => {
-    await findText("Welcome to NetBird");
+    await findText("Welcome to Sightwell Connectivity");
     const field = (placeholder: string) =>
       document.querySelector(`input[placeholder="${placeholder}"]`);
     await type(field("Your name"), "Olivia Owner");

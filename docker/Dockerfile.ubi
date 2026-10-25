@@ -3,13 +3,14 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:7fbeae18dc9476399f565e68
 ARG VERSION=dev
 ARG RELEASE=0
 
-LABEL name="netbird-dashboard" \
-      maintainer="NetBird <dev@netbird.io>" \
-      vendor="NetBird GmbH" \
+# Fork-specific (Sightwell Connectivity) image metadata. The AGPL-3.0 licence
+# and third-party notices are copied into /licenses below, unchanged.
+LABEL name="sightwell-netbird-dashboard" \
+      vendor="KeyBeyond (Sightwell)" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Dashboard" \
-      description="Web UI for managing NetBird peers, users, and access policies."
+      summary="Sightwell Connectivity dashboard" \
+      description="Sightwell-branded build of the NetBird dashboard (AGPL-3.0): web UI for managing NetBird peers, users, and access policies."
 
 # Only nginx-core: the nginx metapackage pulls in a default web root and logos
 # that would clash with out/. Our nginx config lives outside the RPM-owned

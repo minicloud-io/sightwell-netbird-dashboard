@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@components/Button";
-import { NetBirdLogo } from "@components/NetBirdLogo";
 import { AnnouncementBanner } from "@components/ui/AnnouncementBanner";
 import HelpAndSupportButton from "@components/ui/HelpAndSupportButton";
 import UserDropdown from "@components/ui/UserDropdown";
@@ -9,6 +8,7 @@ import { cn } from "@utils/helpers";
 import { useGuardedRouter } from "@utils/navigation-guard";
 import { MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import React from "react";
+import { BrandLogo } from "@/branding/BrandLogo";
 import { DistributorTransferAccountModal } from "@/cloud/distributor/DistributorTransferAccountModal";
 import { MSPTenantsSwitcher } from "@/cloud/msp/MSPTenantsSwitcher";
 import { MSPTransferAccountModal } from "@/cloud/msp/MSPTransferAccountModal";
@@ -61,7 +61,8 @@ export default function NavbarWithDropdown() {
                 "cursor-pointer hover:opacity-70 transition-all mr-auto"
               }
             >
-              <NetBirdLogo />
+              {/* Fork-specific: the Sightwell lockup with the module name. */}
+              <BrandLogo mobile module surface={"theme"} />
             </button>
             <ToggleCollapsableNavigationButton />
           </div>

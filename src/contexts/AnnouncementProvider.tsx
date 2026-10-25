@@ -10,14 +10,16 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { BRAND } from "@/branding/brand";
 import { useMSP } from "@/cloud/msp/contexts/MSPProvider";
 import { trialExpiresInfo, usageLimitInfo } from "@/contexts/BillingProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 
 const config = loadConfig();
 
-const ANNOUNCEMENTS_URL =
-  "https://raw.githubusercontent.com/netbirdio/dashboard/main/announcements.json";
+// Fork-specific: upstream hard-codes its GitHub announcements.json here; the
+// fork reads the feed URL from the brand module and ships with none.
+const ANNOUNCEMENTS_URL = BRAND.announcementsUrl;
 const STORAGE_KEY = "netbird-announcements";
 const CACHE_DURATION_MS = 30 * 60 * 1000;
 
@@ -87,7 +89,9 @@ const getRemoteAnnouncements = async (): Promise<{
 
     let raw: Announcement[];
 
-    if (stored && now - stored.timestamp < CACHE_DURATION_MS) {
+    if (!ANNOUNCEMENTS_URL) {
+      raw = [];
+    } else if (stored && now - stored.timestamp < CACHE_DURATION_MS) {
       raw = stored.announcements;
     } else {
       const response = await fetch(ANNOUNCEMENTS_URL);

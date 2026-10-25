@@ -1,3 +1,15 @@
+# Sightwell Connectivity dashboard image (fork)
+
+This image is the **Sightwell Connectivity** build of the NetBird dashboard:
+the same static export, nginx configuration, entrypoint and environment
+variables as upstream, with the Sightwell presentation layer applied. Image
+names below are upstream's; the fork publishes to
+`ghcr.io/minicloud-io/sightwell-netbird-dashboard` (see
+`docs/sightwell/RELEASE.md`). Everything else in this document applies
+unchanged.
+
+---
+
 # NetBird Dashboard
 
 NetBird Dashboard is NetBird's management server UI.

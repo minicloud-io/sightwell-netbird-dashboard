@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@components/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,23 +10,34 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@components/DropdownMenu";
+import { cn } from "@utils/helpers";
+import { useGuardedRouter } from "@utils/navigation-guard";
+import { isNetBirdCloud } from "@utils/netbird";
 import {
   ArrowUpRightIcon,
   BookText,
   CircleQuestionMark,
+  CodeIcon,
+  InfoIcon,
   MailIcon,
-  MessageSquareShare,
   MessagesSquareIcon,
   TriangleAlert,
 } from "lucide-react";
 import { useState } from "react";
-import Button from "@components/Button";
-import { cn } from "@utils/helpers";
-import SlackIcon from "@/assets/icons/SlackIcon";
-import { isNetBirdCloud } from "@utils/netbird";
+import { BRAND, brandSourceTreeUrl } from "@/branding/brand";
 
+/*
+ * Fork-specific (Sightwell Connectivity). Upstream's menu points at NetBird's
+ * documentation, forum, Slack and a product-feedback form. The documentation,
+ * troubleshooting guide and community forum genuinely cover the NetBird
+ * client and server this deployment runs, so they stay and are labelled as
+ * NetBird's. The Slack invite and the feedback form are NetBird's product
+ * channels and are dropped; the About page and the source-code offer take
+ * their place. No Sightwell support URL is invented here.
+ */
 export default function HelpAndSupportButton() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const router = useGuardedRouter();
 
   return (
     <DropdownMenu
@@ -41,11 +53,12 @@ export default function HelpAndSupportButton() {
             "!rounded-full h-[38px] w-[38px] !p-0",
             dropdownOpen && "text-white",
           )}
+          aria-label={"Help and support"}
         >
           <CircleQuestionMark size={18} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-60" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1 px-1">
             <div className="text-sm font-normal leading-none text-nb-gray-200 py-1">
@@ -55,28 +68,28 @@ export default function HelpAndSupportButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          href="https://docs.netbird.io/"
+          href={BRAND.links.documentation}
           target="_blank"
           rel="noopener noreferrer"
           asChild
         >
           <div className={"flex gap-3 items-center"}>
             <BookText size={14} />
-            Documentation
+            NetBird documentation
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
-          href="https://docs.netbird.io/help/troubleshooting-client"
+          href={BRAND.links.troubleshooting}
           target="_blank"
           rel="noopener noreferrer"
           asChild
         >
           <div className={"flex gap-3 items-center"}>
             <TriangleAlert size={14} />
-            Troubleshooting
+            Client troubleshooting
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />
@@ -95,28 +108,14 @@ export default function HelpAndSupportButton() {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          href="https://forum.netbird.io/"
+          href={BRAND.links.communityForum}
           target="_blank"
           rel="noopener noreferrer"
           asChild
         >
           <div className={"flex gap-3 items-center"}>
             <MessagesSquareIcon size={14} />
-            NetBird Forum
-          </div>
-          <DropdownMenuShortcut>
-            <ArrowUpRightIcon size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          href="https://docs.netbird.io/slack-url"
-          target="_blank"
-          rel="noopener noreferrer"
-          asChild
-        >
-          <div className={"flex gap-3 items-center"}>
-            <SlackIcon size={14} />
-            NetBird Slack
+            NetBird community forum
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />
@@ -126,14 +125,25 @@ export default function HelpAndSupportButton() {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          href={"https://forms.gle/TeLw2zrXEdw6RcQ36"}
-          target={"_blank"}
+          onClick={() => {
+            setDropdownOpen(false);
+            router.push("/about");
+          }}
+        >
+          <div className={"flex gap-3 items-center"}>
+            <InfoIcon size={14} />
+            About and open source notices
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          href={brandSourceTreeUrl()}
+          target="_blank"
           rel="noopener noreferrer"
           asChild
         >
           <div className={"flex gap-3 items-center"}>
-            <MessageSquareShare size={14} />
-            Feedback
+            <CodeIcon size={14} />
+            Source code
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />
