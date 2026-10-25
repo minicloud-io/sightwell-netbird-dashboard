@@ -123,9 +123,17 @@ e2e suite.
   Loading`), type check and lint clean, unit tests unchanged (907).
 - `deploy/idp-theme/` was rendered with hand-filled template variables and
   screenshotted (`idp-login`, `idp-logout`, `idp-password-error`, dark and
-  light). **Not served by a running Dex** and **not activatable** with the
-  current NetBird server (its README explains why and what upstream change
-  is needed).
+  light).
+- Served by a real server on 2026-10-25: the Sightwell server fork image
+  `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.1` was
+  started locally with `server.auth.theme` pointing at a mount of this
+  directory. The embedded Dex initialised, the page it served had
+  `<title>Sightwell Connectivity</title>`, the Sightwell lockup and no
+  "netbird" text, and `theme/favicon.svg` answered 200. A theme directory
+  without `static/` made Dex refuse to start ("failed to load web static"),
+  which is why the start-up validation now requires it; a missing directory
+  fails on boot with "embedded IdP frontend dir … no such file or
+  directory". Not exercised: a full sign-in through a connector.
 
 ## Known limitations and pre-existing issues
 
