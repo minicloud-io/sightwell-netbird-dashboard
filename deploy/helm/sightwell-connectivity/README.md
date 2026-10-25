@@ -25,8 +25,8 @@ imagePullSecrets:
   - name: ghcr-sightwell
 server:
   image:
-    tag: v0.81.4-sightwell.4
-    digest: sha256:8baf1cce26f7b90dd95e29f068dfa17d35615f49b45a54bcddc31aa834999c09
+    tag: v0.81.4-sightwell.6
+    digest: sha256:4ab658e5d133f46256d92d916c11347ba09c6a37fbdd588fa4075f8e6f552161
   authSecret: "<openssl rand -base64 32>"
   store:
     encryptionKey: "<openssl rand -base64 32>"

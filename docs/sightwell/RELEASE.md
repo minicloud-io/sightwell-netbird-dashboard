@@ -153,7 +153,7 @@ image (`minicloud-io/sightwell-netbird-server`, upstream `v0.81.4` plus the
 
 | | |
 | --- | --- |
-| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.4@sha256:8baf1cce26f7b90dd95e29f068dfa17d35615f49b45a54bcddc31aa834999c09` (serves the theme from an in-memory snapshot, so ConfigMap mounts of any layout work; `.1` to `.3` are superseded: `.3` `sha256:a1a87bc9…` failed on kubelet's `..data` entries, earlier ones validated less) |
+| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.6@sha256:4ab658e5d133f46256d92d916c11347ba09c6a37fbdd588fa4075f8e6f552161` (adds `server.updates`, the release sources for the version check; `.4` `sha256:8baf1cce…` works but checks NetBird's releases; `.5` was never built; `.1` to `.3` are superseded) |
 | Platforms | linux/amd64, linux/arm64 |
 | Config | `server.auth.theme: {dir: /etc/netbird/idp-theme, name: sightwell, displayName: "Sightwell Connectivity"}` in the server's `config.yaml` |
 | Theme files | `deploy/idp-theme/` from this repository, mounted as in its README |
