@@ -71,7 +71,10 @@ mounts.
   projected volume** into `/etc/netbird/idp-theme` with the layout Dex
   expects (`templates/`, `static/`, `themes/<name>/`, `robots.txt`), so
   there is no file-level `subPath` mount that could land on a directory.
-  Switched on with `server.auth.theme`.
+  Switched on with `server.auth.theme`. From server `v0.81.4-sightwell.4`
+  the directory is read into memory at start (kubelet's `..data` entries
+  skipped), so the mount layout no longer matters to Dex; the projected
+  layout is kept because it is the simplest to reason about.
 - `Deployment <release>-server` (1 replica, `Recreate`, PVC for
   `/var/lib/netbird`) and `Service`.
 - `Deployment <release>-dashboard` (rootless image, UID 10001) and

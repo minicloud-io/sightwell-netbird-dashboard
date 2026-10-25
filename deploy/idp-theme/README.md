@@ -92,7 +92,13 @@ containers:
 
 The server (fork image `v0.81.4-sightwell.3` or later) validates the directory
 at start-up and names the missing piece, so a wrong mount fails fast with a
-readable log line instead of a Dex error.
+readable log line instead of a Dex error. From `v0.81.4-sightwell.4` the
+server also reads the directory into memory at start and skips kubelet's
+`..data` and `..<timestamp>` entries, which Dex would otherwise try to parse
+as templates, so a ConfigMap mounted directly at `templates/` works as well
+as the projected layout; there is no need to mount files one by one, and
+`subPath` file mounts are better avoided anyway (they also never pick up
+ConfigMap updates). A changed theme needs a pod restart.
 
 ## Keeping it in step with upstream
 
