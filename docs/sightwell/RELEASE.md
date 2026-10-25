@@ -156,6 +156,10 @@ kubectl -n <namespace> get pod -l <selector> -o jsonpath='{.items[0].status.cont
 
 | | |
 | --- | --- |
+| First fork release | `v2.95.0-sightwell.1` (commit `0b2ed3221423689505710a1e22f814a13b24dfbb`, built 2026-10-25 by run 40159917842) |
+| → standard | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.1@sha256:18bd73b79da9aeae87e605053810820cc1def7652350a9d3f536f0cfea2cdec8` |
+| → rootless | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.1-rootless@sha256:75e95967fe94afdbbd9e1db15ce4f4c0485585f0b196a68550722bc5d7a84921` |
+| → ubi | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.1-ubi@sha256:72af615c5cb600340117e88c8ce69a880f7590ff83790579a7359af922212138` |
 | Previous image | `netbirdio/dashboard:latest` |
 | Previous digest (running in the cluster) | **not read, record before rollout** |
 | Docker Hub `latest` on 2026-10-24 | `netbirdio/dashboard@sha256:3d6adfee19dd8d34d795af51daee69d27d2081d2076a5a304cfdd14acc67d6f4` (= `v2.95.0`) |
