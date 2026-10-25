@@ -51,7 +51,7 @@ server:
 
 The server validates the directory at start-up (it must contain
 `templates/header.html`, `footer.html`, `login.html`, `logout.html`,
-`password.html`, `error.html` and `themes/sightwell/`), which this
+`password.html`, `error.html`, plus `static/` and `themes/sightwell/`), which this
 directory does. Without the block, or with the upstream image, NetBird's
 own pages are served as before. The alternative that needs no server
 change remains signing in through the external identity provider directly
