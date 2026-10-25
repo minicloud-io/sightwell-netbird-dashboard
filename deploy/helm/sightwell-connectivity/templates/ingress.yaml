@@ -1,0 +1,64 @@
+{{- if .Values.ingress.enabled }}
+{{- $full := include "sc.fullname" . }}
+{{- $tlsSecret := default (printf "%s-tls" $full) .Values.ingress.tls.secretName }}
+# HTTP/1.1 and WebSocket paths: dashboard at /, the server's API, OIDC, relay
+# and websocket proxy under their prefixes (NetBird's reverse-proxy layout).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $full }}
+  labels: {{- include "sc.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16m"
+    {{- with .Values.ingress.annotations }}{{ toYaml . | nindent 4 }}{{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts: [{{ .Values.domain | quote }}]
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.domain | quote }}
+      http:
+        paths:
+          {{- range list "/api" "/oauth2" "/relay" "/ws-proxy" }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend: { service: { name: {{ $full }}-server, port: { name: http } } }
+          {{- end }}
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: {{ $full }}-dashboard, port: { name: http } } }
+---
+# gRPC paths (management, signal, proxy service) need an h2c backend, which
+# ingress-nginx selects per Ingress object, hence the second resource.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $full }}-grpc
+  labels: {{- include "sc.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    {{- with .Values.ingress.annotations }}{{ toYaml . | nindent 4 }}{{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts: [{{ .Values.domain | quote }}]
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.domain | quote }}
+      http:
+        paths:
+          {{- range list "/management.ManagementService" "/signalexchange.SignalExchange" "/management.ProxyService" }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend: { service: { name: {{ $full }}-server, port: { name: http } } }
+          {{- end }}
+{{- end }}

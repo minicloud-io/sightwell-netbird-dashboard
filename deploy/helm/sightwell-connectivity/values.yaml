@@ -1,0 +1,119 @@
+# Sightwell Connectivity: one public host serves the dashboard at / and the
+# NetBird server (API, OIDC, relay, signal and management gRPC) under its
+# paths, the layout NetBird's own getting-started uses behind a reverse proxy.
+domain: connectivity.example.internal
+
+# Pull secret(s) for ghcr.io/minicloud-io; both packages are private unless made public.
+#   kubectl create secret docker-registry ghcr-sightwell --docker-server=ghcr.io \
+#     --docker-username=<github-user> --docker-password=<token with read:packages>
+imagePullSecrets: []
+#  - name: ghcr-sightwell
+
+server:
+  image:
+    repository: ghcr.io/minicloud-io/sightwell-netbird-server
+    tag: v0.81.4-sightwell.2
+    # Pin the manifest digest from the release notes / RELEASE.md; used instead of the tag when set.
+    digest: ""
+    pullPolicy: IfNotPresent
+  # The combined server keeps its state in dataDir (SQLite by default): one replica.
+  replicaCount: 1
+  containerPort: 80 # plain HTTP + h2c inside the cluster; TLS terminates at the ingress
+
+  # Required. Shared secret for relay authentication:  openssl rand -base64 32
+  authSecret: ""
+  store:
+    engine: sqlite # sqlite | postgres | mysql
+    dsn: ""
+    # Required. Data-store encryption key:  openssl rand -base64 32
+    encryptionKey: ""
+
+  auth:
+    # OIDC issuer; empty = https://<domain>/oauth2
+    issuer: ""
+    localAuthDisabled: false
+    signKeyRefreshEnabled: true
+    # Optional AES key (16/24/32 bytes, base64 ok) for the IdP session cookie:  openssl rand -hex 16
+    sessionCookieEncryptionKey: ""
+    # empty = https://<domain>/nb-auth and https://<domain>/nb-silent-auth
+    dashboardRedirectURIs: []
+    cliRedirectURIs:
+      - "http://localhost:53000/"
+    # Optional first owner (email + bcrypt hash or password hash per NetBird docs); leave empty for the setup wizard.
+    owner: {}
+    # Sightwell theme for the sign-in, sign-out, password, device and error pages.
+    # Needs the Sightwell server image (upstream's ignores the block). The theme
+    # files ship inside the chart (files/idp-theme, copied from deploy/idp-theme).
+    theme:
+      enabled: true
+      name: sightwell
+      displayName: "Sightwell Connectivity"
+      mountPath: /etc/netbird/idp-theme
+
+  # Local STUN needs a UDP port reachable from peers, which an HTTP ingress cannot
+  # give. Empty disables local STUN; list external STUN servers in `stuns` instead.
+  stunPorts: []
+  stuns: []
+  #  - uri: stun:stun.example.com:3478
+
+  # Anything else under `server:` in config.yaml, merged verbatim (reverseProxy,
+  # relays, signalUri, activityStore, authStore, tls, logLevel, …). Example:
+  # extraConfig:
+  #   reverseProxy:
+  #     trustedHTTPProxiesCount: 1
+  extraConfig: {}
+
+  # Bring your own complete config.yaml instead (Secret with key config.yaml);
+  # the chart then renders nothing of the above except the theme mounts.
+  existingConfigSecret: ""
+
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    existingClaim: ""
+    accessModes: [ReadWriteOnce]
+
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podAnnotations: {}
+
+dashboard:
+  image:
+    repository: ghcr.io/minicloud-io/sightwell-netbird-dashboard
+    tag: v2.95.0-sightwell.2-rootless
+    digest: ""
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  containerPort: 8080 # rootless image; the standard image listens on 80 as root
+  # Extra environment for the dashboard, e.g. NETBIRD_ANNOUNCEMENT: "Staging"
+  extraEnv: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 0
+    fsGroup: 0
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop: [ALL]
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podAnnotations: {}
+
+ingress:
+  enabled: true
+  className: nginx
+  # Added to both Ingress objects (HTTP and gRPC); cert-manager example:
+  #   cert-manager.io/cluster-issuer: letsencrypt
+  annotations: {}
+  tls:
+    enabled: true
+    secretName: "" # empty = <release>-tls

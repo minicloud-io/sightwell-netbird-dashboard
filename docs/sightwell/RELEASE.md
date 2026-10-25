@@ -153,10 +153,11 @@ image (`minicloud-io/sightwell-netbird-server`, upstream `v0.81.4` plus the
 
 | | |
 | --- | --- |
-| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.1@sha256:311c0b8e9bae21d24c97cecf37a21d3109cee17f971701ecc934a38a77cc9d33` |
+| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.2@sha256:547d03a7c4b958e6b8b4dafeb535f84f7d73fba474b224df033ab13ab1b57842` (v0.81.4-sightwell.1 was `sha256:311c0b8e…`, superseded: it accepted a theme directory without `static/`, which Dex then rejected at start) |
 | Platforms | linux/amd64, linux/arm64 |
 | Config | `server.auth.theme: {dir: /etc/netbird/idp-theme, name: sightwell, displayName: "Sightwell Connectivity"}` in the server's `config.yaml` |
 | Theme files | `deploy/idp-theme/` from this repository, mounted as in its README |
+| Helm | `deploy/helm/sightwell-connectivity` renders server, dashboard, theme ConfigMaps, services and the split HTTP/gRPC ingress for one domain (see its README) |
 
 This is a change to the server workload, outside the "replace only the
 dashboard image" scope of the dashboard rollout above; treat it as its own

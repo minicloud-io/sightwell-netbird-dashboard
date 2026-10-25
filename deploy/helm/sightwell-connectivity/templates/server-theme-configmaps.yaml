@@ -1,0 +1,32 @@
+{{- if .Values.server.auth.theme.enabled }}
+{{- $theme := .Values.server.auth.theme.name }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sc.fullname" . }}-idp-templates
+  labels: {{- include "sc.labels" . | nindent 4 }}
+data:
+{{ (.Files.Glob "files/idp-theme/templates/*.html").AsConfig | indent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sc.fullname" . }}-idp-static
+  labels: {{- include "sc.labels" . | nindent 4 }}
+data:
+  main.css: {{ .Files.Get "files/idp-theme/static/main.css" | quote }}
+  robots.txt: {{ .Files.Get "files/idp-theme/robots.txt" | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sc.fullname" . }}-idp-theme
+  labels: {{- include "sc.labels" . | nindent 4 }}
+data:
+  favicon.svg: {{ .Files.Get "files/idp-theme/themes/sightwell/favicon.svg" | quote }}
+  styles.css: {{ .Files.Get "files/idp-theme/themes/sightwell/styles.css" | quote }}
+binaryData:
+  favicon.ico: {{ .Files.Get "files/idp-theme/themes/sightwell/favicon.ico" | b64enc }}
+  favicon.png: {{ .Files.Get "files/idp-theme/themes/sightwell/favicon.png" | b64enc }}
+  logo.png: {{ .Files.Get "files/idp-theme/themes/sightwell/logo.png" | b64enc }}
+{{- end }}

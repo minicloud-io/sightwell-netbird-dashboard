@@ -1,0 +1,14 @@
+Sightwell Connectivity is being rolled out.
+
+  Dashboard:  https://{{ .Values.domain }}/
+  Sign-in:    {{ include "sc.issuer" . }}  (embedded IdP{{ if .Values.server.auth.theme.enabled }}, Sightwell theme "{{ .Values.server.auth.theme.name }}"{{ end }})
+  Server:     {{ include "sc.image" .Values.server.image }}
+  Dashboard:  {{ include "sc.image" .Values.dashboard.image }}
+
+First start: open https://{{ .Values.domain }}/ and complete the instance setup
+wizard (first administrator) unless server.auth.owner was set.
+
+Peers connect with:  netbird up --management-url https://{{ .Values.domain }}
+
+Keep server.authSecret and server.store.encryptionKey stable across upgrades;
+changing the encryption key makes the existing store unreadable.

@@ -1,0 +1,14 @@
+{{ template "header.html" . }}
+
+<div class="nb-card">
+    <h1 class="nb-heading">Signed out</h1>
+    <p class="nb-subheading">You have been signed out of Sightwell Connectivity.</p>
+
+    {{ if .BackURL }}
+    <div class="nb-back-link">
+        <a href="{{ .BackURL }}" class="nb-link">&larr; Back to Sightwell Connectivity</a>
+    </div>
+    {{ end }}
+</div>
+
+{{ template "footer.html" . }}

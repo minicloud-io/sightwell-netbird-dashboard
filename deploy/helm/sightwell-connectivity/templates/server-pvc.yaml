@@ -1,0 +1,15 @@
+{{- if and .Values.server.persistence.enabled (not .Values.server.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "sc.fullname" . }}-server-data
+  labels: {{- include "sc.labels" . | nindent 4 }}
+spec:
+  accessModes: {{ toJson .Values.server.persistence.accessModes }}
+  {{- with .Values.server.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.server.persistence.size }}
+{{- end }}

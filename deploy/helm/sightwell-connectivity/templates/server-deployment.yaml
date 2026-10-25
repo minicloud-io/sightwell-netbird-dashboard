@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sc.fullname" . }}-server
+  labels: {{- include "sc.labels" . | nindent 4 }}
+    app.kubernetes.io/component: server
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {{- include "sc.selector" . | nindent 6 }}
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      labels: {{- include "sc.selector" . | nindent 8 }}
+        app.kubernetes.io/component: server
+      annotations:
+        checksum/config: {{ include "sc.serverConfig" . | sha256sum }}
+        {{- with .Values.server.podAnnotations }}{{ toYaml . | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: netbird-server
+          image: {{ include "sc.image" .Values.server.image | quote }}
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          args: ["--config", "/etc/netbird/config.yaml"]
+          ports:
+            - { name: http, containerPort: {{ .Values.server.containerPort }} }
+            - { name: metrics, containerPort: 9090 }
+            - { name: health, containerPort: 9000 }
+          readinessProbe:
+            tcpSocket: { port: health }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: { port: health }
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          {{- with .Values.server.securityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - { name: config, mountPath: /etc/netbird/config.yaml, subPath: config.yaml, readOnly: true }
+            - { name: data, mountPath: /var/lib/netbird }
+            {{- if .Values.server.auth.theme.enabled }}
+            {{- $mp := .Values.server.auth.theme.mountPath }}
+            - { name: idp-templates, mountPath: {{ printf "%s/templates" $mp | quote }}, readOnly: true }
+            - { name: idp-static, mountPath: {{ printf "%s/static" $mp | quote }}, readOnly: true }
+            - { name: idp-static, mountPath: {{ printf "%s/robots.txt" $mp | quote }}, subPath: robots.txt, readOnly: true }
+            - { name: idp-theme, mountPath: {{ printf "%s/themes/%s" $mp .Values.server.auth.theme.name | quote }}, readOnly: true }
+            {{- end }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ default (printf "%s-server-config" (include "sc.fullname" .)) .Values.server.existingConfigSecret }}
+        - name: data
+          {{- if .Values.server.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-server-data" (include "sc.fullname" .)) .Values.server.persistence.existingClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.server.auth.theme.enabled }}
+        - { name: idp-templates, configMap: { name: {{ include "sc.fullname" . }}-idp-templates } }
+        - { name: idp-static, configMap: { name: {{ include "sc.fullname" . }}-idp-static } }
+        - { name: idp-theme, configMap: { name: {{ include "sc.fullname" . }}-idp-theme } }
+        {{- end }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
