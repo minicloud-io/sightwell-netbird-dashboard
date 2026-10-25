@@ -30,6 +30,12 @@ The images carry OCI labels from `docker/metadata-action`
 Sightwell title, vendor and licence labels. It needs no secrets beyond the
 workflow's `GITHUB_TOKEN` (`packages: write`, `contents: write`).
 
+Every action it uses is pinned to a commit SHA with the release in a
+comment (`actions/checkout@3d3c42e… # v7.0.1`), and the fork's Actions
+settings require SHA pinning, so an unpinned `uses:` fails to run.
+`.github/dependabot.yml` opens monthly PRs that move the pins; review the
+release notes of each bump before merging.
+
 Upstream's `build_and_push.yml` is kept unchanged for easy upgrades but
 must stay **disabled in the fork's Actions** (it publishes NetBird's images
 with NetBird's secrets), as must `sync-deploy-templates.yml`. GitHub only

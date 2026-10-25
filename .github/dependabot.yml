@@ -1,0 +1,11 @@
+# Fork-specific (Sightwell Connectivity): the fork's workflow pins every
+# action to a commit SHA; Dependabot keeps those pins current with version
+# comments. npm dependencies are deliberately not covered here: they follow
+# upstream and move with the baseline (docs/sightwell/UPSTREAM.md).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels: [ci]
