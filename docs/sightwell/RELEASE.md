@@ -153,7 +153,7 @@ image (`minicloud-io/sightwell-netbird-server`, upstream `v0.81.4` plus the
 
 | | |
 | --- | --- |
-| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.3@sha256:a1a87bc9193564bf9e912755c4a15ae9ccf6fc1f35e6add56ca61827ef97624d` (`.2` `sha256:547d03a7…` and `.1` `sha256:311c0b8e…` are superseded: their start-up validation did not yet require `static/` and `robots.txt`, which Dex needs) |
+| Image | `ghcr.io/minicloud-io/sightwell-netbird-server:v0.81.4-sightwell.4@sha256:8baf1cce26f7b90dd95e29f068dfa17d35615f49b45a54bcddc31aa834999c09` (serves the theme from an in-memory snapshot, so ConfigMap mounts of any layout work; `.1` to `.3` are superseded: `.3` `sha256:a1a87bc9…` failed on kubelet's `..data` entries, earlier ones validated less) |
 | Platforms | linux/amd64, linux/arm64 |
 | Config | `server.auth.theme: {dir: /etc/netbird/idp-theme, name: sightwell, displayName: "Sightwell Connectivity"}` in the server's `config.yaml` |
 | Theme files | `deploy/idp-theme/` from this repository, mounted as in its README |

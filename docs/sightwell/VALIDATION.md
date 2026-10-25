@@ -134,6 +134,11 @@ e2e suite.
   which is why the start-up validation now requires it; a missing directory
   fails on boot with "embedded IdP frontend dir … no such file or
   directory". Not exercised: a full sign-in through a connector.
+- Server `v0.81.4-sightwell.4` was run against a theme directory laid out
+  like a ConfigMap mounted at `templates/` (`..data` symlink,
+  `..<timestamp>` directory, symlinked files); `.3` fails on it with
+  "read templates/..data: is a directory", `.4` starts, serves the
+  Sightwell-titled page and the theme favicon.
 
 ## Known limitations and pre-existing issues
 
