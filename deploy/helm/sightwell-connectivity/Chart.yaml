@@ -3,7 +3,7 @@ name: sightwell-connectivity
 description: Sightwell Connectivity, the NetBird dashboard and server for one domain, with the Sightwell identity on the dashboard and on the embedded identity provider's pages.
 type: application
 version: 0.1.0
-appVersion: "v2.95.0-sightwell.2"
+appVersion: "v2.95.0-sightwell.3"
 keywords: [netbird, sightwell, vpn, zero-trust]
 sources:
   - https://github.com/minicloud-io/sightwell-netbird-dashboard

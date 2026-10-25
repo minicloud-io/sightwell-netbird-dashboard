@@ -92,7 +92,7 @@ server:
 dashboard:
   image:
     repository: ghcr.io/minicloud-io/sightwell-netbird-dashboard
-    tag: v2.95.0-sightwell.2-rootless
+    tag: v2.95.0-sightwell.3-rootless
     digest: ""
     pullPolicy: IfNotPresent
   replicaCount: 1

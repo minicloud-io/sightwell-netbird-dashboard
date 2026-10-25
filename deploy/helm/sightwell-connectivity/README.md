@@ -39,8 +39,8 @@ server:
       trustedHTTPProxiesCount: 1   # one ingress hop in front of the server
 dashboard:
   image:
-    tag: v2.95.0-sightwell.2-rootless
-    digest: sha256:d8f90643efed6cf417a9ecb21934bf3c6b86a24fe2458e5b347bf2efc8eabf6f
+    tag: v2.95.0-sightwell.3-rootless
+    digest: sha256:4fe5ba369bd97fd3c2502bad481ae1c503c3b3c01588f9742b506663f7ea696f
 ingress:
   className: nginx
   annotations:
