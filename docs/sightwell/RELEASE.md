@@ -156,6 +156,10 @@ kubectl -n <namespace> get pod -l <selector> -o jsonpath='{.items[0].status.cont
 
 | | |
 | --- | --- |
+| Current fork release | `v2.95.0-sightwell.2` (commit `b5b15d87`, built 2026-10-25 by run 40172605075): branded loading spinner, dependency security fixes |
+| → standard | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.2@sha256:e933bba506f8a226f4e3ba9751f59fd94b68c3d2f27c360353ea9b3be4277c8e` |
+| → rootless | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.2-rootless@sha256:d8f90643efed6cf417a9ecb21934bf3c6b86a24fe2458e5b347bf2efc8eabf6f` |
+| → ubi | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.2-ubi@sha256:ede5482c0b0baa527d4813a8f697b4f42647d3661f367210a7d035943d668f9a` |
 | First fork release | `v2.95.0-sightwell.1` (commit `0b2ed3221423689505710a1e22f814a13b24dfbb`, built 2026-10-25 by run 40159917842) |
 | → standard | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.1@sha256:18bd73b79da9aeae87e605053810820cc1def7652350a9d3f536f0cfea2cdec8` |
 | → rootless | `ghcr.io/minicloud-io/sightwell-netbird-dashboard:v2.95.0-sightwell.1-rootless@sha256:75e95967fe94afdbbd9e1db15ce4f4c0485585f0b196a68550722bc5d7a84921` |
