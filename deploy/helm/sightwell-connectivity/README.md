@@ -87,6 +87,10 @@ mounts.
   `/signalexchange.SignalExchange`, `/management.ProxyService`), the route
   split from NetBird's reverse-proxy layout. Another ingress controller
   needs the equivalent h2c setting for the gRPC paths.
+- `ConfigMap <release>-native-signin` (only with `nativeSignIn.entra.enabled`):
+  `sightwell-signin.json`, mounted into the dashboard's web root and served
+  at `/.well-known/sightwell-signin.json`; a checksum annotation rolls the
+  dashboard pod when it changes.
 
 ## Theme files
 
@@ -95,6 +99,47 @@ after changing the theme. The server refuses to start, naming the item, if
 the mounted directory lacks a required template, `static/`, `themes/<name>/`
 or the `robots.txt` file (all of which Dex itself needs). Check a mount
 from inside the pod with `kubectl exec <server pod> -- ls -R /etc/netbird/idp-theme`.
+
+## Native sign-in on iOS
+
+The Sightwell iOS app can sign users in with Microsoft Entra directly
+(Microsoft Authenticator, or Microsoft's own sign-in sheet) instead of the
+browser page. The app gets an Entra ID token and the device exchanges it at
+the embedded IdP for a NetBird token (RFC 8693, public client
+`netbird-cli`, no secret on the phone). Same NetBird user as the browser
+sign-in, so existing devices and permissions carry over. Entra MFA and
+conditional access apply, because Microsoft does the sign-in.
+
+Requirements: the embedded IdP with an Entra connector (Settings >
+Identity Providers in the dashboard). Nothing changes on the server or in
+Dex: the connector type supports token exchange and NetBird allows every
+grant type on it.
+
+1. **Entra** (the app registration the connector uses, Entra admin centre >
+   App registrations > that app > Authentication): add the platform
+   **iOS / macOS** with bundle ID `ai.sightwell.connectivity.ios`. Entra
+   creates the redirect URI `msauth.ai.sightwell.connectivity.ios://auth`.
+   "Allow public client flows" is not needed. Optional: a conditional access
+   policy for this app requiring a compliant device.
+2. **Chart values**, then `helm upgrade`:
+
+   ```yaml
+   nativeSignIn:
+     entra:
+       enabled: true
+       tenantId: <Entra directory (tenant) ID>
+       clientId: <application (client) ID of that app registration>
+       connectorId: <connector ID shown in the dashboard>
+   ```
+
+3. **Check**: `curl -s https://<domain>/.well-known/sightwell-signin.json`
+   returns the three values (public identifiers, no secrets).
+4. **Users**: on the next Connect the app shows Authenticator or
+   Microsoft's sheet. Without the file, or if native sign-in fails, the app
+   offers the browser sign-in.
+
+Turn it off with `enabled: false`; the app falls back to the browser
+sign-in at the next sign-in.
 
 ## Upgrades and rollback
 

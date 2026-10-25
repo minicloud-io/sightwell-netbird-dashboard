@@ -14,8 +14,14 @@ spec:
     metadata:
       labels: {{- include "sc.selector" . | nindent 8 }}
         app.kubernetes.io/component: dashboard
-      {{- with .Values.dashboard.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $signin := .Values.nativeSignIn.entra.enabled }}
+      {{- if or .Values.dashboard.podAnnotations $signin }}
+      annotations:
+        {{- with .Values.dashboard.podAnnotations }}{{ toYaml . | nindent 8 }}{{- end }}
+        {{- if $signin }}
+        # subPath mounts don't follow ConfigMap edits; roll the pod instead.
+        checksum/native-signin: {{ include (print $.Template.BasePath "/native-signin-configmap.yaml") . | sha256sum }}
+        {{- end }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -58,9 +64,21 @@ spec:
           {{- with .Values.dashboard.securityContext }}
           securityContext: {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- if $signin }}
+          volumeMounts:
+            - name: native-signin
+              mountPath: /usr/share/nginx/html/.well-known/sightwell-signin.json
+              subPath: sightwell-signin.json
+              readOnly: true
+          {{- end }}
           {{- with .Values.dashboard.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
+      {{- if $signin }}
+      volumes:
+        - name: native-signin
+          configMap: { name: {{ include "sc.fullname" . }}-native-signin }
+      {{- end }}
       {{- with .Values.dashboard.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

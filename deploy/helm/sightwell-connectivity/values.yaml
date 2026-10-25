@@ -119,6 +119,18 @@ dashboard:
   affinity: {}
   podAnnotations: {}
 
+# Native Entra sign-in in the Sightwell iOS app (MSAL with Microsoft
+# Authenticator, token exchange at the embedded IdP). When enabled, the
+# dashboard serves /.well-known/sightwell-signin.json with these public
+# identifiers; without it the app uses the browser sign-in. See README.md,
+# "Native sign-in on iOS".
+nativeSignIn:
+  entra:
+    enabled: false
+    tenantId: ""     # Entra directory (tenant) ID
+    clientId: ""     # the app registration the IdP's Entra connector uses
+    connectorId: ""  # the IdP connector ID (Settings > Identity Providers)
+
 ingress:
   enabled: true
   className: nginx

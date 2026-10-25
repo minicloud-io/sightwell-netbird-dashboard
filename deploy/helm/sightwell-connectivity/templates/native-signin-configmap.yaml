@@ -1,0 +1,17 @@
+{{- with .Values.nativeSignIn.entra }}
+{{- if .enabled }}
+{{- if not (and .tenantId .clientId .connectorId) }}
+{{- fail "nativeSignIn.entra needs tenantId, clientId and connectorId" }}
+{{- end }}
+# Served by the dashboard at /.well-known/sightwell-signin.json and read by the
+# Sightwell iOS app before sign-in (public identifiers only, no secrets).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sc.fullname" $ }}-native-signin
+  labels: {{- include "sc.labels" $ | nindent 4 }}
+data:
+  sightwell-signin.json: |
+    {{- dict "version" 1 "entra" (dict "tenantId" .tenantId "clientId" .clientId "connectorId" .connectorId) | toPrettyJson | nindent 4 }}
+{{- end }}
+{{- end }}
