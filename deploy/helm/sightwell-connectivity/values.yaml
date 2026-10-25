@@ -12,7 +12,7 @@ imagePullSecrets: []
 server:
   image:
     repository: ghcr.io/minicloud-io/sightwell-netbird-server
-    tag: v0.81.4-sightwell.2
+    tag: v0.81.4-sightwell.3
     # Pin the manifest digest from the release notes / RELEASE.md; used instead of the tag when set.
     digest: ""
     pullPolicy: IfNotPresent
