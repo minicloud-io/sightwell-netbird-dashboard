@@ -54,7 +54,6 @@ record together with git history):
 | `src/modules/users/PendingApproval.tsx` | support link replaced, footer |
 | `src/app/PublicPages.stories.tsx` | expected welcome text |
 | `build.sh` | image name, `SIGHTWELL_REVISION`, writes `out/third-party-licenses.txt` |
-| `.github/workflows/build_and_push.yml` | GHCR under `minicloud-io` only, revision env, notices into `out/` |
 | `docker/Dockerfile.ubi` | image labels |
 | `docker/README.md`, `README.md` | fork notice prepended |
 
@@ -67,6 +66,7 @@ Added files:
 | `src/assets/sightwell/*` (+ `README.md`) | brand SVGs |
 | `src/app/icon.svg` | SVG favicon |
 | `src/app/(dashboard)/about/{layout,page}.tsx`, `About.stories.tsx` | About page |
+| `.github/workflows/sightwell-image.yml` | the fork's image and release workflow (upstream's `build_and_push.yml` is unchanged and disabled in the fork) |
 | `NOTICE.md`, `docs/sightwell/*` | notices and this documentation |
 
 Nothing else moved: routes, API calls, permissions, forms, OIDC, the nginx
@@ -92,7 +92,9 @@ config, `config.json` and `init_react_envs.sh` are upstream's.
 6. Capture before/after screenshots (`VALIDATION.md`) and tag the release
    (`RELEASE.md`).
 
-Upstream workflows that assume NetBird's infrastructure (`bump-netbird.yml`,
-`sync-deploy-templates.yml`, `e2e-test.yml`, `docs-ack.yml`) are untouched;
-they fail or do nothing without NetBird's secrets. Disable them in the fork's
-Actions settings rather than deleting them, to keep the diff small.
+Upstream workflows that assume NetBird's infrastructure (`build_and_push.yml`,
+`bump-netbird.yml`, `sync-deploy-templates.yml`, `e2e-test.yml`,
+`docs-ack.yml`) are untouched; they fail or do nothing without NetBird's
+secrets. `build_and_push.yml` and `sync-deploy-templates.yml` are disabled in
+the fork's Actions settings (not deleted, to keep the diff small); the fork
+builds images with `sightwell-image.yml`.

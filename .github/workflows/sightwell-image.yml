@@ -1,0 +1,233 @@
+# Fork-specific (Sightwell Connectivity): builds this fork's dashboard images
+# and publishes them to the fork's own GitHub Container Registry.
+#
+# Upstream's build_and_push.yml is left untouched (it publishes NetBird's
+# images with NetBird's secrets) and should stay disabled in this repository.
+#
+#   push of a tag  v*      → images tagged <tag> (+ -rootless, -ubi), latest,
+#                            and a GitHub release carrying the corresponding
+#                            source archive and the third-party notices
+#   push to main           → images tagged main (+ variants) and sha-<short>
+#   workflow_dispatch      → build only, unless "push" is ticked
+#
+# The images carry OCI labels (source, revision, version) and the About page
+# links the exact commit, so a deployment pins <tag>@sha256:<digest> from the
+# step summary. See docs/sightwell/RELEASE.md.
+name: Sightwell image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      push:
+        description: "Push the images to GHCR"
+        type: boolean
+        default: false
+
+concurrency:
+  group: sightwell-image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # release assets on tags
+  packages: write # ghcr.io
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  IRONRDP_TAG: v0.0.2
+  PUSH: ${{ github.event_name == 'push' || inputs.push == true }}
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - run: echo '{}' > .local-config.json
+
+      # The browser RDP client ships as prebuilt files from NetBird's IronRDP
+      # fork, the same way upstream's workflow fetches them.
+      - name: Download IronRDP release files
+        uses: robinraju/release-downloader@v1.13
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: netbirdio/IronRDP
+          tag: ${{ env.IRONRDP_TAG }}
+          fileName: "*"
+          out-file-path: public/ironrdp-pkg
+
+      - name: Version from the tag
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=development" >> "$GITHUB_OUTPUT"
+          fi
+          echo "release=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Build the static export
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DASHBOARD_VERSION: ${{ steps.version.outputs.version }}
+          SIGHTWELL_REVISION: ${{ github.sha }}
+          SIGHTWELL_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+
+      - name: Third-party notices (About page link and UBI /licenses)
+        run: |
+          mkdir -p licenses
+          node docker/third-party-licenses.mjs > licenses/THIRD-PARTY-LICENSES.txt
+          cp licenses/THIRD-PARTY-LICENSES.txt out/third-party-licenses.txt
+
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        if: env.PUSH == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: latest=false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=sha
+          labels: |
+            org.opencontainers.image.title=Sightwell Connectivity dashboard
+            org.opencontainers.image.description=Sightwell-branded build of the NetBird dashboard (AGPL-3.0)
+            org.opencontainers.image.vendor=KeyBeyond (Sightwell)
+            org.opencontainers.image.licenses=AGPL-3.0
+
+      - name: Image metadata (rootless)
+        id: meta_rootless
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: |
+            latest=false
+            suffix=-rootless,onlatest=true
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=sha
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Image metadata (ubi)
+        id: meta_ubi
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: |
+            latest=false
+            suffix=-ubi,onlatest=true
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=sha
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push (standard, nginx on :80)
+        id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.PUSH == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push (rootless, :8080, UID 10001)
+        id: push_rootless
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile.rootless
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.PUSH == 'true' }}
+          tags: ${{ steps.meta_rootless.outputs.tags }}
+          labels: ${{ steps.meta_rootless.outputs.labels }}
+
+      - name: Build and push (Red Hat UBI)
+        id: push_ubi
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile.ubi
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.PUSH == 'true' }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            RELEASE=${{ steps.version.outputs.release }}
+          tags: ${{ steps.meta_ubi.outputs.tags }}
+          labels: ${{ steps.meta_ubi.outputs.labels }}
+
+      - name: Summary
+        run: |
+          {
+            echo "## Sightwell Connectivity dashboard images"
+            echo
+            echo "Revision \`${GITHUB_SHA}\`, version \`${{ steps.version.outputs.version }}\`, pushed: \`${PUSH}\`"
+            echo
+            echo "| Variant | Digest |"
+            echo "| --- | --- |"
+            echo "| standard | \`${{ steps.push.outputs.digest }}\` |"
+            echo "| rootless | \`${{ steps.push_rootless.outputs.digest }}\` |"
+            echo "| ubi | \`${{ steps.push_ubi.outputs.digest }}\` |"
+            echo
+            echo "Pin a deployment to \`${IMAGE}:<tag>@<digest>\`."
+            echo
+            echo '```'
+            echo "${{ steps.meta.outputs.tags }}"
+            echo "${{ steps.meta_rootless.outputs.tags }}"
+            echo "${{ steps.meta_ubi.outputs.tags }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The AGPL source offer in the dashboard links this commit on GitHub. A
+      # release additionally carries the archive and notices, so an offline
+      # installation can ship them next to the image tarball.
+      - name: Corresponding source archive
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="sightwell-netbird-dashboard-${GITHUB_REF_NAME}/" \
+            -o "dist/sightwell-netbird-dashboard-${GITHUB_REF_NAME}-source.tar.gz" "${GITHUB_SHA}"
+          cp licenses/THIRD-PARTY-LICENSES.txt dist/third-party-licenses.txt
+
+      - name: GitHub release with source and notices
+        if: startsWith(github.ref, 'refs/tags/') && env.PUSH == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "Sightwell Connectivity dashboard ${GITHUB_REF_NAME} (commit ${GITHUB_SHA})."
+            echo
+            echo "Images: ${IMAGE}:${GITHUB_REF_NAME} (also -rootless and -ubi); digests are in the workflow run summary."
+            echo
+            echo "Corresponding source (AGPL-3.0) and third-party notices are attached."
+          } > release-notes.md
+          gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes-file release-notes.md dist/*

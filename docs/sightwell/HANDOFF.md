@@ -23,8 +23,9 @@ for what was run. In short:
 - About page (`/about`) with build info, the source-code offer pinned to the
   build commit, licence, third-party notices and modifications links;
 - release plumbing: fork revision and source URL baked in at build time,
-  third-party notices written into the static export, image labels, CI
-  publishing to the fork's GHCR only.
+  third-party notices written into the static export, image labels, and the
+  fork's own `sightwell-image.yml` workflow publishing to the fork's GHCR
+  (`RELEASE.md`).
 
 Mock-backed: every screenshot in `screenshots/` comes from Storybook with
 the repository's fixtures (`.storybook/mocks`). No backend, IdP or customer

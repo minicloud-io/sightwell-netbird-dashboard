@@ -110,7 +110,7 @@ not done.
 | Copy | `error/page.tsx`, `invite/page.tsx`, `InstanceSetupWizard.tsx`, `PendingApproval.tsx` | "Welcome to Sightwell Connectivity", "account administrator", no NetBird support desk link |
 | Primary button | `src/components/Button.tsx` | ink text on orange |
 | Palette | `tailwind.config.ts` | see Tokens |
-| Image metadata | `docker/Dockerfile.ubi`, CI labels | Sightwell names; AGPL and third-party notices unchanged |
+| Image metadata | `docker/Dockerfile.ubi`, `sightwell-image.yml` labels | Sightwell names; AGPL and third-party notices unchanged |
 
 Left as NetBird on purpose: install instructions and `netbird up` commands,
 "NetBird IP Address" on the peer page, "Get Started with NetBird" empty
