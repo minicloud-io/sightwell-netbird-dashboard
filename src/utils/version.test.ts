@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { compareVersions, isNativeSSHSupported, isNewerVersion } from "./version";
+import {
+  compareVersions,
+  forkBuildNumber,
+  isNativeSSHSupported,
+  isNewerVersion,
+} from "./version";
 
 describe("isNativeSSHSupported", () => {
   it.each([
@@ -109,7 +114,44 @@ describe("isNewerVersion (update available)", () => {
       desc: "development build",
     },
     { current: "0.77.0", latest: "", expected: false, desc: "unknown latest" },
-  ])("$current → $latest → $expected ($desc)", ({ current, latest, expected }) => {
-    expect(isNewerVersion(current, latest)).toBe(expected);
+  ])(
+    "$current → $latest → $expected ($desc)",
+    ({ current, latest, expected }) => {
+      expect(isNewerVersion(current, latest)).toBe(expected);
+    },
+  );
+});
+
+describe("fork builds (vX.Y.Z-sightwell.N)", () => {
+  it("compares fork builds of the same upstream release by build number", () => {
+    expect(isNewerVersion("v2.95.0-sightwell.2", "v2.95.0-sightwell.3")).toBe(
+      true,
+    );
+    expect(isNewerVersion("v2.95.0-sightwell.3", "v2.95.0-sightwell.3")).toBe(
+      false,
+    );
+    expect(isNewerVersion("v2.95.0-sightwell.3", "v2.95.0-sightwell.2")).toBe(
+      false,
+    );
+  });
+
+  it("still ranks a newer upstream release above any fork build of an older one", () => {
+    expect(isNewerVersion("v2.95.0-sightwell.3", "v2.96.0-sightwell.1")).toBe(
+      true,
+    );
+    expect(isNewerVersion("v2.96.0-sightwell.1", "v2.95.0-sightwell.9")).toBe(
+      false,
+    );
+  });
+
+  it("treats an upstream release with no fork build as the same release", () => {
+    expect(isNewerVersion("v2.95.0-sightwell.2", "v2.95.0")).toBe(false);
+    expect(isNewerVersion("v2.95.0", "v2.95.0-sightwell.2")).toBe(false);
+  });
+
+  it("reads the build number", () => {
+    expect(forkBuildNumber("v2.95.0-sightwell.12")).toBe(12);
+    expect(forkBuildNumber("v2.95.0")).toBeUndefined();
+    expect(forkBuildNumber("v2.95.0-rc.1")).toBeUndefined();
   });
 });

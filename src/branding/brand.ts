@@ -113,6 +113,17 @@ export const BRAND = {
   thirdPartyNoticesPath: "/third-party-licenses.txt",
 } as const;
 
+/**
+ * Fork releases are tagged v<upstream>-sightwell.<n>. The label lets the
+ * version helpers keep that suffix visible and compare fork builds of the
+ * same upstream release by <n> (upstream's helpers drop everything after
+ * the release numbers).
+ */
+export const FORK_RELEASE_LABEL = "sightwell";
+
+/** Where the dashboard's own releases (and upgrade notes) are published. */
+export const brandReleasesUrl = () => `${BRAND.sourceUrl}/releases`;
+
 export const brandSourceTreeUrl = () =>
   sourceTreeUrl(BRAND.sourceUrl, BRAND.revision);
 export const brandLicenseUrl = () =>

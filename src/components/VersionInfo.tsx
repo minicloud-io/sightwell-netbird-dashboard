@@ -9,6 +9,7 @@ import { isNewerVersion } from "@utils/version";
 import { ArrowUpCircle } from "lucide-react";
 import * as React from "react";
 import Skeleton from "react-loading-skeleton";
+import { brandReleasesUrl, FORK_RELEASE_LABEL } from "@/branding/brand";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { VersionInfo as VersionInfoType } from "@/interfaces/Instance";
@@ -22,7 +23,12 @@ function formatVersion(version: string): string {
 
 // A pre-release label names the release itself, so it stays in the short form.
 // Anything else after the release names the build and is dropped.
-const PRERELEASE_LABEL = /^(rc|alpha|beta)[\w.]*$/i;
+// Fork-specific: the fork's own release label stays visible as well, so
+// "v2.95.0-sightwell.3" is shown in full rather than as "v2.95.0".
+const PRERELEASE_LABEL = new RegExp(
+  `^(rc|alpha|beta|${FORK_RELEASE_LABEL})[\\w.]*$`,
+  "i",
+);
 
 // A goreleaser snapshot is built from an unreleased tree and versioned as the
 // NEXT release ("0.77.1-SNAPSHOT-a1b2c3d" is built after 0.77.0 shipped), so
@@ -175,7 +181,8 @@ const NavigationVersionInfoContent = () => {
 
       {hasUpdate && (
         <a
-          href="https://docs.netbird.io/selfhosted/maintenance/upgrade"
+          // Fork-specific: this deployment updates from the fork's releases.
+          href={brandReleasesUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-1.5 text-white font-medium bg-netbird hover:bg-netbird-500 transition-colors rounded-md py-1.5 px-2 mt-1"

@@ -56,6 +56,13 @@ server:
   stuns: []
   #  - uri: stun:stun.example.com:3478
 
+  # Where the server looks for newer releases (the sidebar's "Update available"
+  # and the dashboard's "Latest" tooltip). GitHub releases API URLs of the two
+  # Sightwell forks; empty strings fall back to NetBird's upstream sources.
+  updates:
+    managementReleasesURL: https://api.github.com/repos/minicloud-io/sightwell-netbird-server/releases/latest
+    dashboardReleasesURL: https://api.github.com/repos/minicloud-io/sightwell-netbird-dashboard/releases/latest
+
   # Anything else under `server:` in config.yaml, merged verbatim (reverseProxy,
   # relays, signalUri, activityStore, authStore, tls, logLevel, …). Example:
   # extraConfig:

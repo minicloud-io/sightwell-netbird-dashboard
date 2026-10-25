@@ -1,5 +1,6 @@
 import { getOperatingSystem } from "@hooks/useOperatingSystem";
 import dayjs from "dayjs";
+import { FORK_RELEASE_LABEL } from "@/branding/brand";
 import { OperatingSystem } from "@/interfaces/OperatingSystem";
 import { NetbirdRelease } from "@/interfaces/Version";
 
@@ -103,6 +104,17 @@ export const isDevelopmentVersion = (version: string): boolean => {
 };
 
 /**
+ * Fork-specific: the build number of a "v2.95.0-sightwell.3" style version
+ * (3), or undefined for anything else.
+ */
+export const forkBuildNumber = (version: string): number | undefined => {
+  const match = new RegExp(`-${FORK_RELEASE_LABEL}\\.(\\d+)$`, "i").exec(
+    version.trim(),
+  );
+  return match ? parseInt(match[1], 10) : undefined;
+};
+
+/**
  * Returns true when `latest` is a strictly newer release than `current` — i.e.
  * an update is available. Only release components decide: an enterprise build
  * ("0.77.0+enterprise.1") is up to date against the "0.77.0" it was built from,
@@ -127,6 +139,13 @@ export const isNewerVersion = (current: string, latest: string): boolean => {
     if (latestPart < currentPart) return false;
   }
 
+  // Fork-specific: same upstream release on both sides, so the fork build
+  // number decides (v2.95.0-sightwell.3 is newer than v2.95.0-sightwell.2).
+  const currentBuild = forkBuildNumber(current);
+  const latestBuild = forkBuildNumber(latest);
+  if (currentBuild !== undefined && latestBuild !== undefined) {
+    return latestBuild > currentBuild;
+  }
   return false;
 };
 

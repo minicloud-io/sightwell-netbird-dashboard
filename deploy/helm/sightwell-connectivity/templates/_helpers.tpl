@@ -81,6 +81,13 @@ server:
       name: {{ .Values.server.auth.theme.name | quote }}
       displayName: {{ .Values.server.auth.theme.displayName | quote }}
 {{- end }}
+{{- with .Values.server.updates }}
+{{- if or .managementReleasesURL .dashboardReleasesURL }}
+  updates:
+    managementReleasesURL: {{ .managementReleasesURL | quote }}
+    dashboardReleasesURL: {{ .dashboardReleasesURL | quote }}
+{{- end }}
+{{- end }}
   store:
     engine: {{ .Values.server.store.engine | quote }}
     dsn: {{ .Values.server.store.dsn | quote }}
