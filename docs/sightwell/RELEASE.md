@@ -4,12 +4,26 @@
 
 - Fork tags: `v<upstream>-sightwell.<n>`, e.g. `v2.95.0-sightwell.1`. The
   upstream part names the baseline; `n` counts fork releases on it. The
-  scheduled sync (below) creates these tags itself; a manual release is
+  sync workflow (below) creates these tags itself when dispatched; a manual
+  release is
   `git tag -a v2.95.0-sightwell.2 -m "…" && git push origin v2.95.0-sightwell.2`
-  from the reviewed commit on `main`.
-- `main` is the release line: baseline release plus the branding. It is not
-  tracking upstream `main`; the sync moves it from release tag to release
-  tag.
+  from the reviewed commit on the release line.
+- `main` is meant to be the release line: baseline release plus the
+  branding, moved from release tag to release tag by the sync rather than
+  tracking upstream `main`. **Not yet the case:** as of 2026-10-26 the
+  fork's `main` is still upstream's `main` (left as it is, by decision), so
+  the release line is `feat/sightwell-branding` and every `-sightwell.<n>`
+  tag so far was cut from it. Consequences while that holds:
+  - Dependabot scans the default branch, so the fork shows upstream's open
+    alerts (8 on 2026-10-26: `next`, `storybook`, `undici`,
+    `@vitest/mocker`). All of them are fixed on `feat/sightwell-branding`
+    (`VALIDATION.md`, "Dependency security bumps"); they close once `main`
+    carries the fork.
+  - Workflows run from the default branch, so the sync workflow below cannot
+    be dispatched, and the "push to `main`" image build never fires.
+  - Pointing `main` at the branch needs a force push (`main` has upstream
+    commits after `v2.95.0`, among them the Tailwind v4 move, which conflict
+    with the branding). That is the owner's call and done by hand.
 - `NEXT_PUBLIC_DASHBOARD_VERSION` is set from the tag by CI (upstream's
   mechanism) and shown in the sidebar and on About.
 - `SIGHTWELL_REVISION` is the commit; the About page and footer link
@@ -60,9 +74,13 @@ is the way to trial the pipeline (use a `-rc` tag).
 
 ## Staying current with upstream
 
-`.github/workflows/sightwell-sync-upstream.yml` runs every Monday 05:17 UTC
-and on demand (optionally with a specific upstream tag). When upstream has a
-release newer than `UPSTREAM.baselineTag` in `src/branding/brand.ts` it:
+`.github/workflows/sightwell-sync-upstream.yml` runs only when dispatched
+(optionally with a specific upstream tag); its weekly schedule was removed
+on 2026-10-26 because a clean run publishes images without a review step.
+It can be dispatched only once `main` carries the fork (see "Versioning").
+Until then upgrades follow the manual procedure in `UPSTREAM.md`. When
+upstream has a release newer than `UPSTREAM.baselineTag` in
+`src/branding/brand.ts` it:
 
 1. merges that release tag into `main` on a `sync/upstream-<tag>` branch;
 2. rewrites the baseline tag and commit in `brand.ts` and the table in

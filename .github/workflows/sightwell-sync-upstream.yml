@@ -1,8 +1,8 @@
 # Fork-specific (Sightwell Connectivity): keeps the fork on NetBird's latest
 # dashboard release.
 #
-# Every Monday (and on demand) it fetches upstream's tags, and when a release
-# newer than the recorded baseline exists it
+# On demand it fetches upstream's tags, and when a release newer than the
+# recorded baseline exists it
 #   1. merges that tag into main on a sync branch,
 #   2. updates the baseline recorded in src/branding/brand.ts and
 #      docs/sightwell/UPSTREAM.md,
@@ -14,11 +14,14 @@
 # issue with the details and stops; nothing reaches main until someone fixes
 # it. Visual changes are not judged here: review the branding after each
 # sync with `npm run test:visual` (docs/sightwell/UPSTREAM.md).
+#
+# There is no schedule: a clean sync publishes images without a review step,
+# so it runs only when someone dispatches it (decided 2026-10-26). Like every
+# workflow it runs from the default branch, so it can be dispatched only once
+# `main` carries the fork (docs/sightwell/RELEASE.md).
 name: Sightwell upstream sync
 
 on:
-  schedule:
-    - cron: "17 5 * * 1"
   workflow_dispatch:
     inputs:
       tag:

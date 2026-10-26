@@ -73,7 +73,7 @@ Added files:
 | `src/app/icon.svg` | SVG favicon |
 | `src/app/(dashboard)/about/{layout,page}.tsx`, `About.stories.tsx` | About page |
 | `.github/workflows/sightwell-image.yml` | the fork's image and release workflow (upstream's `build_and_push.yml` is unchanged and disabled in the fork) |
-| `.github/workflows/sightwell-sync-upstream.yml` | weekly merge of the latest upstream release into `main`, baseline bump, build, test, tag |
+| `.github/workflows/sightwell-sync-upstream.yml` | on-demand merge of the latest upstream release into `main`, baseline bump, build, test, tag (no schedule) |
 | `.github/dependabot.yml` | keeps the workflows' action pins current |
 | `NOTICE.md`, `docs/sightwell/*` | notices and this documentation |
 
@@ -82,8 +82,10 @@ config, `config.json` and `init_react_envs.sh` are upstream's.
 
 ## Upgrade procedure
 
-The scheduled sync workflow (`RELEASE.md`, "Staying current with upstream")
-does steps 1 to 5 for a clean merge and opens an issue otherwise. By hand:
+The sync workflow (`RELEASE.md`, "Staying current with upstream"), when
+dispatched, does steps 1 to 5 for a clean merge and opens an issue
+otherwise. It has no schedule and cannot run until `main` carries the fork,
+so for now upgrades are done by hand:
 
 1. `git fetch upstream --tags` and pick the release the deployment will run
    (read the image labels as in `RELEASE.md`).

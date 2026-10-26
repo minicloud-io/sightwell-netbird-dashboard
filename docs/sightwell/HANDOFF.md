@@ -56,9 +56,11 @@ files to keep the diff small. Doing so is a 20-line change in
    `--remote=false` together with a repository argument), `origin` points at
    it, `upstream` is fetch-only (`git remote set-url --push upstream no_push`)
    and `feat/sightwell-branding` is pushed. Never push to `netbirdio/dashboard`.
-2. **Review the branch** on the fork (one commit on top of `v2.95.0`); open a
-   pull request against the fork's own `main` when it is accepted, never
-   against upstream.
+2. **The fork's `main`** is still upstream's `main`; on 2026-10-26 it was
+   left that way, so `feat/sightwell-branding` is the release line and the
+   fork's Dependabot alerts are upstream's (fixed on the branch). Setting
+   `main` needs a force push by the owner, never a pull request against
+   upstream (`RELEASE.md`, "Versioning").
 3. **Read the running dashboard digest** from the cluster and record it in
    `RELEASE.md` as the rollback target.
 4. **Design review** of the screenshots in both themes; decide on the
