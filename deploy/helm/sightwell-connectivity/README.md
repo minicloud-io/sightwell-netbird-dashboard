@@ -85,12 +85,56 @@ mounts.
   `/relay`, `/ws-proxy` to the server, `/` to the dashboard) and gRPC with
   `backend-protocol: GRPC` (`/management.ManagementService`,
   `/signalexchange.SignalExchange`, `/management.ProxyService`), the route
-  split from NetBird's reverse-proxy layout. Another ingress controller
-  needs the equivalent h2c setting for the gRPC paths.
+  split from NetBird's reverse-proxy layout, with 1-day read and send
+  timeouts on the gRPC paths (HTTP paths: 1 hour). Another ingress
+  controller needs the equivalent h2c and timeout settings for the gRPC
+  paths. The controller itself needs one more setting, see "Long-lived gRPC
+  streams" below.
 - `ConfigMap <release>-native-signin` (only with `nativeSignIn.entra.enabled`):
   `sightwell-signin.json`, mounted into the dashboard's web root and served
   at `/.well-known/sightwell-signin.json`; a checksum annotation rolls the
   dashboard pod when it changes.
+
+## Long-lived gRPC streams
+
+Every connected peer holds a Signal stream and a management stream open
+for as long as it is connected, and sends on them only when something
+happens. nginx cuts a stream whose client has sent nothing for
+`client_body_timeout` (60 s by default). Every peer then reconnects Signal
+once a minute, and the logs show:
+
+- client: `Stream receive error: ... stream terminated by RST_STREAM with
+  error code: INTERNAL_ERROR`, then `disconnected from the Signal service
+  but will retry silently`;
+- management job stream: `unexpected HTTP status code received from
+  server: 504 (Gateway Timeout)` when a read timeout in front is still 60 s.
+
+NetBird's own nginx config sets `client_header_timeout 1d`,
+`client_body_timeout 1d` and `grpc_read_timeout`/`grpc_send_timeout 1d`.
+The chart sets the last two on its gRPC Ingress. ingress-nginx has no
+per-Ingress annotation for the client timeouts (and snippet annotations are
+off by default), so set them in the **controller's** ConfigMap. They then
+apply to every Ingress on that controller:
+
+```yaml
+# ConfigMap of the ingress-nginx controller (e.g. ingress-nginx-controller)
+data:
+  client-body-timeout: "86400"
+  client-header-timeout: "86400"
+```
+
+With the ingress-nginx Helm chart that is `controller.config` in its
+values. The controller picks the change up without a restart.
+
+Anything in front of the controller must also keep idle HTTP/2 streams
+open for longer than a minute. That covers a cloud load balancer, an L4
+proxy or a CDN. Set its idle timeout to the maximum it allows (AWS ALB
+defaults to 60 s; an L4 load balancer usually has its own idle timeout
+too). A 504 on the management stream after exactly 60 s points there, or
+to a gRPC Ingress without this chart's annotations.
+
+Check: a client's log should show no `RST_STREAM` or `disconnected from the
+Signal service` lines once a minute.
 
 ## Theme files
 

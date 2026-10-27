@@ -35,6 +35,10 @@ spec:
 ---
 # gRPC paths (management, signal, proxy service) need an h2c backend, which
 # ingress-nginx selects per Ingress object, hence the second resource.
+# Signal and management streams stay open for as long as a peer is
+# connected; ingress-nginx turns these into grpc_read/send_timeout, 1 day
+# like NetBird's own nginx config. The controller's client-body-timeout
+# (60 s by default) must be raised too, see README.md "Long-lived gRPC streams".
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -42,8 +46,8 @@ metadata:
   labels: {{- include "sc.labels" . | nindent 4 }}
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"
     {{- with .Values.ingress.annotations }}{{ toYaml . | nindent 4 }}{{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
