@@ -25,8 +25,8 @@ export const OnboardingExplainPolicy = ({
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-            {`NetBird makes it easy for admins to enforce least-privilege access with access control policies.
-            We've already created one for your resource during onboarding.`}
+            {`Access control policies let you enforce least-privilege access to every site and system.
+            We've already created one for your resource during setup.`}
         </div>
 
         {policy && (

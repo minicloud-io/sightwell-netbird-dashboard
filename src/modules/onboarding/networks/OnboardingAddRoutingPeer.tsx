@@ -118,15 +118,15 @@ export const OnboardingAddRoutingPeer = ({
                     "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
                 }
             >
-                Think of a routing peer as a connector to your internal network.
-                It runs NetBird and lets your remote devices access internal resources, while enforcing access control policies.
+                A routing peer is the connector at the site: one machine on the site network that runs the NetBird client.
+                It forwards traffic to the site&apos;s resources under your access control policies, so the devices there need no agent.
             </div>
             <div
                 className={
                     "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
                 }
             >
-                Generate a setup key and install NetBird on that machine.
+                Generate a setup key and install the NetBird client on that machine.
             </div>
         </div>
 
@@ -174,7 +174,7 @@ export const OnboardingAddRoutingPeer = ({
           <ModalContent>
             <SetupModalContent
               hostname={"routing-peer"}
-              title={"Install NetBird"}
+              title={"Install the NetBird client"}
               setupKey={setupKey.key}
             />
           </ModalContent>

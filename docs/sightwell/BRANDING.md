@@ -109,6 +109,8 @@ not done.
 | Source offer footer | `src/branding/BrandFooter.tsx` | setup wizard, invite, session lost, OIDC error, error page, pending approval |
 | Copy | `error/page.tsx`, `invite/page.tsx`, `InstanceSetupWizard.tsx`, `PendingApproval.tsx` | "Welcome to Sightwell Connectivity", "account administrator", no NetBird support desk link |
 | Version block | `src/components/VersionInfo.tsx`, `src/utils/version.ts` | fork versions shown in full (`v2.95.0-sightwell.3`), fork builds compared by build number, "Update available" links to the fork's releases; the server reports latest versions from the fork repositories when `server.updates` is set |
+| First-run onboarding | `src/modules/onboarding/` (regular flow; see below) | Sightwell Connectivity copy for industrial sites, collectors and site networks; closing step links to the documentation instead of NetBird's YouTube guides |
+| Empty states | `src/components/NoPeersGettingStarted.tsx`, `src/modules/activity/ActivityTable.tsx` | "Get Started with Sightwell Connectivity" |
 | Loading | `src/components/ui/FullScreenLoading.tsx` → `src/branding/BrandSpinner.tsx` | Sightwell mark with a turning signal-orange arc instead of upstream's bouncing bars; stops under reduced motion |
 | Sign-in, sign-out, password, device and error pages | **NetBird server (embedded Dex)**, not the dashboard | themed in `deploy/idp-theme/`; activated by `server.auth.theme` in the Sightwell server fork (see its README) |
 | Primary button | `src/components/Button.tsx` | ink text on orange |
@@ -116,9 +118,41 @@ not done.
 | Image metadata | `docker/Dockerfile.ubi`, `sightwell-image.yml` labels | Sightwell names; AGPL and third-party notices unchanged |
 
 Left as NetBird on purpose: install instructions and `netbird up` commands,
-"NetBird IP Address" on the peer page, "Get Started with NetBird" empty
-state, "Delete NetBird account", posture check names, docs links, package
+"NetBird IP Address" on the peer page, "Delete NetBird account", posture check names, docs links, package
 names, environment variables, API paths and all licence text.
+
+## First-run onboarding
+
+A new tenant's owner lands in the regular onboarding wizard
+(`src/modules/onboarding/Onboarding.tsx`) right after the first sign-in.
+Self-hosted tenants skip the signup survey and start at the intent step, so
+the progress bar shows six steps. Changed on 2026-10-28:
+
+| Step | Upstream | Sightwell |
+| --- | --- | --- |
+| Intent (`OnboardingIntent.tsx`) | "Get started with NetBird"; homelab, laptop, NAS and Raspberry Pi examples | "Get started with Sightwell Connectivity"; the choices are **Connect sites and collectors** (peer-to-peer) and **Remote access to site networks** (one routing peer at the site, no agent on every device). One text for every tenant; the business/personal split is gone |
+| Skip link (`Onboarding.tsx`) | "Already know how NetBird works?" | "Already know how Sightwell Connectivity works?" |
+| Peer-to-peer steps (`p2p/*`) | "device", "Install NetBird", "With NetBird, you decide" | "machine", collectors and site servers as examples, "Install the NetBird client" |
+| Remote access steps (`networks/*`) | generic subnets and services, "NetBird makes it easy" | site network resources (control network, historian, OPC UA server); the routing peer is "the connector at the site" |
+| Waiting and policy cards (`OnboardingDevices.tsx`, `OnboardingPolicy.tsx`) | "device" | "machine" |
+| Closing step (`OnboardingEnd.tsx`) | three NetBird YouTube guides with NetBird screenshots | links to the Sightwell Connectivity documentation (`SIGHTWELL_DOCS_URL`), the NetBird technical reference and client troubleshooting, as in the help menu |
+| Signup survey (`OnboardingSurvey.tsx`) | "Welcome to NetBird", "use NetBird" | product name from `BRAND.fullName` |
+
+Kept on purpose:
+
+- **"NetBird client"** where the user installs it: it is the package they
+  download and the `netbird up` command they type.
+- **The signup survey's options** (referral sources, homelab use cases): the
+  survey renders on NetBird Cloud only and its values feed upstream's
+  HubSpot form and the intent recommendation.
+- **The Agent Network onboarding** (`agent-network/`): it opens only for
+  netbird.ai signups, Agent Network-only deployments or a Cloud account's
+  request, none of which applies to a Sightwell tenant.
+- **The install modal** (`setup-netbird-modal/`), which the wizard opens: its
+  title is passed in by the wizard, its body documents the NetBird client.
+
+`Pages/Platform/Onboarding` in Storybook renders the intent, device,
+resource, routing peer and closing steps.
 
 ## Configuration
 

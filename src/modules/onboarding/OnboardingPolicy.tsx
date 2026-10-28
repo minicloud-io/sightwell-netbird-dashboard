@@ -26,7 +26,7 @@ export const OnboardingPolicy = ({ policy, onToggle }: Props) => {
         </div>
         <div className={"text-nb-gray-300 text-[0.8rem] text-left mt-0.5"}>
           {policy?.name.includes("Default")
-            ? "Allows connections between all your devices"
+            ? "Allows connections between all your machines"
             : policy?.description}
         </div>
       </div>

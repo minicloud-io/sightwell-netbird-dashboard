@@ -33,7 +33,7 @@ export const OnboardingTestP2P = ({
           }
         >
           {
-            "Nice work connecting your devices! Now, let’s have a little fun and test if they can talk to each other."
+            "Both machines are connected. Now test whether they can reach each other."
           }
         </div>
       </div>

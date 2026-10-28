@@ -59,8 +59,8 @@ export const OnboardingDevices = ({
         <WaitingForDevice
           text={
             !firstDevice
-              ? "Waiting for your first device to connect"
-              : "Waiting for your second device to connect"
+              ? "Waiting for your first machine to connect"
+              : "Waiting for your second machine to connect"
           }
         />
       )}
@@ -142,7 +142,7 @@ export const OnboardingDevices = ({
 };
 
 export const WaitingForDevice = ({
-  text = "Waiting for your first device to connect",
+  text = "Waiting for your first machine to connect",
 }: {
   text: string;
 }) => {

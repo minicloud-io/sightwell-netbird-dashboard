@@ -1,17 +1,30 @@
 import { useOidcUser } from "@axa-fr/react-oidc";
 import Button from "@components/Button";
-import { ArrowRightIcon, PlayIcon } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
+import {
+  ArrowRightIcon,
+  BookOpenIcon,
+  ExternalLinkIcon,
+  LifeBuoyIcon,
+  type LucideIcon,
+  NetworkIcon,
+} from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
-import ACLImage from "@/assets/onboarding/acl.png";
-import ActivityImage from "@/assets/onboarding/activity.png";
-import PostureCheckImage from "@/assets/onboarding/posture.png";
+import { BRAND } from "@/branding/brand";
+import { docsUrl } from "@/branding/runtime";
 
 type Props = {
   onFinish?: () => void;
 };
 
+/*
+ * Fork-specific (Sightwell Connectivity): upstream closes the onboarding with
+ * three NetBird YouTube guides, illustrated with NetBird dashboard
+ * screenshots. They advertise NetBird and do not apply to a Sightwell tenant,
+ * so this step points at the same documentation the help menu and the About
+ * page offer: the Sightwell Connectivity documentation, and NetBird's
+ * technical reference for the client, server and APIs the network runs on.
+ */
 export const OnboardingEnd = ({ onFinish }: Props) => {
   const { oidcUser: user } = useOidcUser();
   const name = user?.given_name || user?.name || user?.preferred_username;
@@ -23,42 +36,41 @@ export const OnboardingEnd = ({ onFinish }: Props) => {
       <div>
         <h1 className={"text-xl text-center max-w-sm mx-auto"}>
           {title} <br />
-          You’ve completed the onboarding.
+          You’ve completed the setup.
         </h1>
         <div
           className={
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          What’s next? Check out these guides to get the most out of NetBird. To
-          learn more, explore the dashboard, visit our documentation, or browse
-          our YouTube channel.
+          What’s next? Explore the dashboard to add more sites, collectors and
+          users, or read on to get the most out of {BRAND.fullName}.
         </div>
 
-        <div className={"mt-8 flex flex-col gap-8"}>
-          <VideoGuide
-            title={"Access Control in Under 5 Minutes"}
-            src={ACLImage}
+        <div className={"mt-8 flex flex-col gap-3"}>
+          <GuideLink
+            icon={BookOpenIcon}
+            title={`${BRAND.fullName} documentation`}
             description={
-              "Learn how to manage access for your network resources effectively. Whether you want to restrict access to specific machines or allow certain users to connect."
+              "How sites, collectors and enterprise systems are connected, and how to run the network day to day."
             }
-            href={"https://www.youtube.com/watch?v=WtZD_q-g_Jc"}
+            href={docsUrl()}
           />
-          <VideoGuide
-            title={"Provision Users & Groups From Your IdP"}
-            src={PostureCheckImage}
+          <GuideLink
+            icon={NetworkIcon}
+            title={"NetBird technical reference"}
             description={
-              "Learn how to provision users and groups from your identity provider, such as Okta, Azure AD, or Google Workspace, to manage access control in NetBird and automate onboarding and offboarding processes."
+              "The open-source client, server and APIs the network runs on: access control policies, networks, routing peers, DNS and posture checks."
             }
-            href={"https://www.youtube.com/watch?v=RxYWTpf7cgY"}
+            href={BRAND.links.documentation}
           />
-          <VideoGuide
-            title={"How NetBird Works"}
+          <GuideLink
+            icon={LifeBuoyIcon}
+            title={"Client troubleshooting"}
             description={
-              "Learn more about how NetBird works, its architecture, and how it can help you build secure networks."
+              "What to check when a machine does not connect or cannot reach a resource."
             }
-            src={ActivityImage}
-            href={"https://www.youtube.com/watch?v=CFa7SY4Up9k&t=261s"}
+            href={BRAND.links.troubleshooting}
           />
         </div>
 
@@ -73,59 +85,44 @@ export const OnboardingEnd = ({ onFinish }: Props) => {
   );
 };
 
-type VideoGuideProps = {
-  src?: string | StaticImageData;
-  title?: string;
-  description?: string;
-  href?: string;
+type GuideLinkProps = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  href: string;
 };
 
-const VideoGuide = ({
-  src = ACLImage,
-  title = "Access Control in Under 5 Minutes",
-  description = "Learn how to manage access for your network resources effectively. Whether you want to restrict access to specific machines or allow certain users to connect.",
-  href = "#",
-}: VideoGuideProps) => {
+const GuideLink = ({ icon: Icon, title, description, href }: GuideLinkProps) => {
   return (
-    <div
+    <Link
       className={
-        "flex flex-col sm:flex-row gap-3 items-center text-center sm:text-left sm:gap-6"
+        "flex gap-4 items-start text-left border border-nb-gray-900 rounded-lg px-5 py-4 bg-nb-gray-920 hover:bg-nb-gray-900 transition-all group"
       }
+      target={"_blank"}
+      href={href}
     >
-      <Link
+      <div
         className={
-          "border border-nb-gray-900 rounded-lg p-[2px] bg-nb-gray-920 min-w-[160px] max-w-[160px] relative group hover:bg-nb-gray-900 transition-all"
+          "h-10 w-10 flex items-center justify-center rounded-md shrink-0 bg-nb-gray-900 border border-nb-gray-800 text-netbird"
         }
-        target={"_blank"}
-        href={href}
       >
-        <span
+        <Icon size={18} />
+      </div>
+      <div>
+        <div
           className={
-            "flex items-center justify-center absolute left-0 top-0 h-full w-full"
+            "text-md inline-flex items-center gap-1.5 group-hover:text-netbird transition-all"
           }
         >
-          <div
-            className={
-              "bg-nb-gray-900/50 group-hover:bg-nb-gray-600/50 backdrop-blur h-8 w-8 flex items-center justify-center rounded-full"
-            }
-          >
-            <PlayIcon size={14} />
-          </div>
-        </span>
-        <Image
-          src={src}
-          alt={title}
-          className={"border border-nb-gray-900 rounded-md"}
-        />
-      </Link>
-      <div>
-        <div className={"text-md"}>{title}</div>
+          {title}
+          <ExternalLinkIcon size={12} className={"text-nb-gray-400"} />
+        </div>
         <div
-          className={"text-[0.8rem] text-nb-gray-300 font-light mt-1.5 block"}
+          className={"text-[0.8rem] text-nb-gray-300 font-light mt-1 block"}
         >
           {description}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

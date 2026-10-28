@@ -55,7 +55,7 @@ export const Servers: Story = {
 export const Empty: Story = {
   parameters: { api: { "GET /peers": [] } },
   play: async () => {
-    await text("Get Started with NetBird");
+    await text("Get Started with Sightwell Connectivity");
   },
 };
 

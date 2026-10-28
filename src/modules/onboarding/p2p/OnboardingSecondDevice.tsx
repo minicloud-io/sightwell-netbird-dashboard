@@ -36,8 +36,8 @@ export const OnboardingSecondDevice = ({ secondDevice, onFinish }: Props) => {
   const openNavigatorShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: "Install NetBird",
-        text: "Install NetBird on another device using this link.",
+        title: "Install the NetBird client",
+        text: "Install the NetBird client on another machine using this link.",
         url: getInstallUrl(),
       });
     }
@@ -47,7 +47,7 @@ export const OnboardingSecondDevice = ({ secondDevice, onFinish }: Props) => {
     const choice = await confirm({
       title: `Create a Setup Key?`,
       description:
-        "If you continue, a one-off setup key will be automatically created and you will be able to install NetBird.",
+        "If you continue, a one-off setup key will be automatically created and you will be able to install the NetBird client.",
       confirmText: "Continue",
       cancelText: "Cancel",
       type: "default",
@@ -75,14 +75,13 @@ export const OnboardingSecondDevice = ({ secondDevice, onFinish }: Props) => {
     <div className={"relative flex flex-col h-full gap-4"}>
       <div>
         <h1 className={"text-xl text-center max-w-sm mx-auto"}>
-          {`Time to bring in your second device`}
+          {`Time to bring in your second machine`}
         </h1>
         <div className="text-sm text-nb-gray-300 font-light mt-2 block text-center">
-            Each device (a.k.a. peer) in your NetBird network gets its own private IP and name to communicate securely in the network.
+            Each machine (a peer) in your network gets its own private IP address and name, so sites, collectors and enterprise systems can reach each other securely.
         </div>
         <div className="text-sm text-nb-gray-300 font-light mt-2 block text-center">
-            To complete the setup, just share this link or email it to yourself to set up your next device
-            with ease.
+            To complete the setup, share this link or email it to whoever sets up the next machine, for example at the site.
         </div>
       </div>
 
@@ -111,7 +110,7 @@ export const OnboardingSecondDevice = ({ secondDevice, onFinish }: Props) => {
         )}
       </div>
       <div className="text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4">
-          Use the headless setup to register a peer without a browser or user interaction.{" "}
+          Use the headless setup to register an unattended machine, such as a collector, without a browser or user interaction.{" "}
         <InlineLink onClick={installUsingSetupKey} href={"#"}>
           Install with a setup key
           <ArrowUpRightIcon size={12} />
@@ -122,7 +121,7 @@ export const OnboardingSecondDevice = ({ secondDevice, onFinish }: Props) => {
         <Modal open={open} onOpenChange={setOpen}>
           <ModalContent>
             <SetupModalContent
-              title={"Install NetBird"}
+              title={"Install the NetBird client"}
               setupKey={setupKey.key}
             />
           </ModalContent>

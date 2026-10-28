@@ -54,6 +54,9 @@ record together with git history):
 | `src/modules/users/PendingApproval.tsx` | support link replaced, footer |
 | `src/components/ui/FullScreenLoading.tsx` | renders `BrandSpinner` instead of `LoadingIcon` |
 | `config.json`, `docker/init_react_envs.sh`, `src/utils/config.ts`, `.storybook/mocks/config.ts` | runtime settings `SIGHTWELL_DOCS_URL`, `SIGHTWELL_HIDE_INTEGRATIONS` |
+| `src/modules/onboarding/{Onboarding,OnboardingIntent,OnboardingEnd,OnboardingDevices,OnboardingPolicy,OnboardingSurvey}.tsx`, `src/modules/onboarding/p2p/*.tsx`, `src/modules/onboarding/networks/*.tsx` | first-run onboarding copy (2026-10-28, see BRANDING.md) |
+| `src/components/NoPeersGettingStarted.tsx`, `src/modules/activity/ActivityTable.tsx` | empty-state title from `BRAND.fullName` |
+| `src/app/(dashboard)/peers/Peers.stories.tsx`, `e2e/tests/onboarding-form.spec.ts` | expected onboarding and empty-state text |
 | `src/components/VersionInfo.tsx`, `src/utils/version.ts` | fork version display, fork build comparison, release link |
 | `src/app/PublicPages.stories.tsx` | expected welcome text |
 | `build.sh` | image name, `SIGHTWELL_REVISION`, writes `out/third-party-licenses.txt` |
@@ -72,6 +75,7 @@ Added files:
 | `src/assets/sightwell/*` (+ `README.md`) | brand SVGs |
 | `src/app/icon.svg` | SVG favicon |
 | `src/app/(dashboard)/about/{layout,page}.tsx`, `About.stories.tsx` | About page |
+| `src/modules/onboarding/Onboarding.stories.tsx` | Storybook stories for the regular onboarding steps |
 | `.github/workflows/sightwell-image.yml` | the fork's image and release workflow (upstream's `build_and_push.yml` is unchanged and disabled in the fork) |
 | `.github/workflows/sightwell-sync-upstream.yml` | on-demand merge of the latest upstream release into `main`, baseline bump, build, test, tag (no schedule) |
 | `.github/dependabot.yml` | keeps the workflows' action pins current |

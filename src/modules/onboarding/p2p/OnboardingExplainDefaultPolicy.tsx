@@ -25,8 +25,8 @@ export const OnboardingExplainDefaultPolicy = ({
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-            {`With NetBird, you decide who gets access to what.
-            We've already set up an access policy for your devices.`}
+            {`Access control policies decide which machines and users can reach what.
+            We've already set up an access policy for your machines.`}
         </div>
 
         {policy && (
@@ -35,7 +35,7 @@ export const OnboardingExplainDefaultPolicy = ({
               "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
             }
           >
-              Flip the switch, then try pinging your other device again to see how it affects the connection.
+              Flip the switch, then try pinging your other machine again to see how it affects the connection.
           </div>
         )}
       </div>

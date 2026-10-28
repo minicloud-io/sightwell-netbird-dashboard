@@ -202,8 +202,8 @@ export const OnboardingAddResource = ({
               "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
             }
           >
-            Resources are your subnets, services, or machines inside your network.
-            Pick the type you want to connect to.
+            Resources are the subnets, systems or services on a site network, such as a control network, a historian or an OPC UA server.
+            Pick the type you want to reach.
           </div>
         </div>
 

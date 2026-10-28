@@ -30,15 +30,15 @@ export const OnboardingFirstDevice = ({
     <div className={"relative flex flex-col h-full gap-4"}>
       <div>
         <h1 className={"text-xl text-center"}>
-          {`Let's get your first device online`}
+          {`Let's get your first machine online`}
         </h1>
         <div
           className={
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          {`To access other machines, install NetBird, sign in, and your device joins the network.
-          Every device you add becomes a NetBird peer in your network. It's that simple.`}
+          {`Install the NetBird client on a machine, such as a collector at a site or a server that needs to reach one, and sign in. The machine joins the network as a peer.
+          Every machine you add becomes a peer with its own private address.`}
         </div>
       </div>
 
@@ -48,13 +48,13 @@ export const OnboardingFirstDevice = ({
         </Button>
         <Button variant={"primary"} onClick={() => setOpen(true)}>
           <DownloadIcon size={16} />
-          Install NetBird
+          Install the NetBird client
         </Button>
       </div>
 
       <Modal open={open} onOpenChange={setOpen}>
         <ModalContent className={"!z-[70]"}>
-          <SetupModalContent title={"Install NetBird"} isUserDevice={true} />
+          <SetupModalContent title={"Install the NetBird client"} isUserDevice={true} />
         </ModalContent>
       </Modal>
     </div>

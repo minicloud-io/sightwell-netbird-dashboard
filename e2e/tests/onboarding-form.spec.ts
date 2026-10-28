@@ -182,11 +182,11 @@ test.describe.serial("Onboarding form selection @onboarding @test-build", () => 
       // The signup survey relies on a JWT domain claim self-hosted IdPs don't
       // emit, so the flow skips it and opens on the intent step. Scoped to the
       // form: the dashboard behind the modal has its own "Get Started with
-      // NetBird" heading, and getByText matches case-insensitively.
+      // Sightwell Connectivity" heading, and getByText matches case-insensitively.
       await expect(
         page
           .getByTestId(REGULAR_FORM)
-          .getByRole("heading", { name: "Get started with NetBird" }),
+          .getByRole("heading", { name: "Get started with Sightwell Connectivity" }),
       ).toBeVisible();
     } finally {
       await close();

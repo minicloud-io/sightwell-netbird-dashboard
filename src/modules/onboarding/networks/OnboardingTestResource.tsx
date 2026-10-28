@@ -51,7 +51,7 @@ export const OnboardingTestResource = ({
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          {`Nice work connecting your client device! Now, let’s have a little fun and test if it can reach your resource.`}
+          {`Your device is connected. Now test whether it can reach the resource on the site network.`}
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export const OnboardingTestResource = ({
 
       <Modal open={open} onOpenChange={setOpen}>
         <ModalContent>
-          <SetupModalContent title={"Install NetBird"} />
+          <SetupModalContent title={"Install the NetBird client"} />
         </ModalContent>
       </Modal>
     </div>

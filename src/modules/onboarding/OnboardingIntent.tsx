@@ -6,15 +6,20 @@ import * as React from "react";
 import {useMemo} from "react";
 import NetworkRoutesIcon from "@/assets/icons/NetworkRoutesIcon";
 import PeerIcon from "@/assets/icons/PeerIcon";
+import {BRAND} from "@/branding/brand";
 import {Intent} from "@/modules/onboarding/Onboarding";
 
 type Props =   {
     onSelect: (intent: Intent) => void,
     useCases?: string,
+    // Fork-specific (Sightwell Connectivity): upstream varies the copy between
+    // a business and a personal (homelab) audience, decided by the NetBird
+    // Cloud signup survey. Every Sightwell tenant is an industrial customer, so
+    // the copy no longer depends on it; the prop stays for the caller.
     isBusiness?: boolean
 };
 
-export const OnboardingIntent = ({onSelect, useCases, isBusiness}: Props) => {
+export const OnboardingIntent = ({onSelect, useCases}: Props) => {
     /**
      * Recommend Networks if users ticks any of these use cases
      */
@@ -58,15 +63,15 @@ export const OnboardingIntent = ({onSelect, useCases, isBusiness}: Props) => {
     return (
         <div className={"relative flex flex-col h-full justify-between"}>
             <div>
-                <h1 className={"text-xl text-center"}>Get started with NetBird</h1>
+                <h1 className={"text-xl text-center"}>Get started with {BRAND.fullName}</h1>
                 <div
                     className={
                         "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
                     }
                 >
-                    NetBird provides the flexibility of both a peer-to-peer overlay network and a remote network access
-                    solution.
-                    Choose what fits your needs, you can always combine both.
+                    {BRAND.fullName} connects industrial sites, collectors and enterprise systems
+                    inside your own infrastructure, as a peer-to-peer network, as remote access to
+                    site networks, or both. Choose where to start; you can combine them later.
                 </div>
                 <div
                     className={cn(
@@ -75,18 +80,18 @@ export const OnboardingIntent = ({onSelect, useCases, isBusiness}: Props) => {
                     )}
                 >
                     <IntentCard
-                        title={"Peer-to-Peer Network"}
+                        title={"Connect sites and collectors"}
                         description={
-                        isBusiness ? "Install NetBird on two or more devices to create secure, direct WireGuard connections, like laptop to server or server to database. Add at least two machines to get started." :"Install NetBird on two or more devices in your homelab, such as your laptop, NAS, or Raspberry Pi, to create secure, direct WireGuard connections."
+                            "Install the NetBird client on two or more machines, such as a collector at a site and a server in your data centre, to create secure, direct WireGuard connections between them. Add at least two machines to get started."
                         }
                         recommended={isP2PRecommended}
                         icon={<PeerIcon size={18} className={"fill-netbird"}/>}
                         onClick={() => onSelect(Intent.P2P)}
                     />
                     <IntentCard
-                        title={"Remote Network Access"}
+                        title={"Remote access to site networks"}
                         description={
-                        isBusiness ? "Enable employee remote access to VMs, Kubernetes clusters, and cloud or on-prem resources without installing NetBird on every machine." : "Securely access your homelab remotely from anywhere without installing NetBird on every device."
+                            "Reach PLCs, historians, servers and other systems on a site network from your own device, without installing an agent on every device there. One routing peer at the site forwards the traffic under your access policies."
                         }
                         recommended={isNetworksRecommended}
                         icon={<NetworkRoutesIcon size={18} className={"fill-netbird"}/>}

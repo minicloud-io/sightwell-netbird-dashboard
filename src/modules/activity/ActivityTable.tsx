@@ -26,6 +26,7 @@ import React, { useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { useSWRConfig } from "swr";
 import PeerIcon from "@/assets/icons/PeerIcon";
+import { BRAND } from "@/branding/brand";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ActivityEvent } from "@/interfaces/ActivityEvent";
 import { ActivityEntryRow } from "@/modules/activity/ActivityEntryRow";
@@ -192,7 +193,7 @@ export default function ActivityTable({
               size={"large"}
             />
           }
-          title={"Get Started with NetBird"}
+          title={`Get Started with ${BRAND.fullName}`}
           description={
             "It looks like you don't have any connected machines.\n" +
             "Get started by adding one to your network."

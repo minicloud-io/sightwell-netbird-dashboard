@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { useSWRConfig } from "swr";
+import { BRAND } from "@/branding/brand";
 import { HubspotFormField } from "@/contexts/AnalyticsProvider";
 import { Group } from "@/interfaces/Group";
 import { Network, NetworkResource, NetworkRouter } from "@/interfaces/Network";
@@ -591,7 +592,7 @@ export const Onboarding = ({
                     "text-sm text-nb-gray-400 font-light pb-10 text-center px-4"
                   }
                 >
-                  Already know how NetBird works?
+                  Already know how {BRAND.fullName} works?
                   <InlineLink
                     href={"#"}
                     className={"!text-nb-gray-200 ml-1"}
