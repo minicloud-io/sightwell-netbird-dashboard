@@ -4,6 +4,7 @@ import InstallPage from "@/app/install/page";
 import InviteAcceptPage from "@/app/invite/page";
 import NotFound from "@/app/not-found";
 import SetupPage from "@/app/setup/page";
+import TenantSettingUpPage from "@/branding/TenantSettingUp";
 import InstanceSetupProvider from "@/contexts/InstanceSetupProvider";
 import { dialog, findText, settle, type } from "@/storybook/platform";
 
@@ -22,6 +23,16 @@ export const Install: Story = {
   play: async () => {
     await dialog();
     await settle(600);
+  },
+};
+
+// Fork-specific: shown while the deployment still configures the tenant.
+export const TenantSettingUp: Story = {
+  parameters: nav("/"),
+  render: () => <TenantSettingUpPage poll={false} />,
+  play: async () => {
+    await findText("Your tenant is being set up");
+    await settle();
   },
 };
 

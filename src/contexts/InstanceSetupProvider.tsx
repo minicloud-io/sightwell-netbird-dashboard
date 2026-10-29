@@ -5,6 +5,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import FullScreenLoading from "@/components/ui/FullScreenLoading";
 import { fetchInstanceStatus } from "@/utils/unauthenticatedApi";
 import { isNetBirdCloud } from "@utils/netbird";
+import TenantSettingUp from "@/branding/TenantSettingUp";
+import {
+  fetchTenantSetup,
+  type TenantSetupState,
+} from "@/branding/tenantSetup";
 
 interface InstanceSetupContextType {
   setupRequired: boolean;
@@ -32,6 +37,8 @@ export default function InstanceSetupProvider({
 }) {
   const [setupRequired, setSetupRequired] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Fork-specific: null while the Sightwell tenant file is being read.
+  const [tenant, setTenant] = useState<TenantSetupState | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -42,6 +49,13 @@ export default function InstanceSetupProvider({
   // Skip setup check for NetBird hosted (cloud) deployments
   const isCloud = isNetBirdCloud();
   const isSetupPage = pathname === "/setup";
+
+  // Fork-specific: the deployment marks the tenant "configuring" until its
+  // last unit finishes; sign-in fails until then (see branding/tenantSetup).
+  useEffect(() => {
+    if (!shouldBypass) void fetchTenantSetup().then(setTenant);
+  }, [shouldBypass]);
+  const tenantState = shouldBypass ? "ready" : tenant;
 
   // Check instance status on mount
   useEffect(() => {
@@ -70,13 +84,22 @@ export default function InstanceSetupProvider({
 
   // Handle redirect separately to avoid setState during render conflicts
   useEffect(() => {
-    if (setupRequired && !shouldBypass && !isSetupPage) {
+    // Fork-specific: never offer owner setup while the deployment configures
+    // the tenant; the deployment creates the owner itself.
+    if (
+      setupRequired &&
+      !shouldBypass &&
+      !isSetupPage &&
+      tenantState === "ready"
+    ) {
       router.replace("/setup");
     }
-  }, [setupRequired, shouldBypass, router, isSetupPage]);
+  }, [setupRequired, shouldBypass, router, isSetupPage, tenantState]);
+
+  if (tenantState === "configuring") return <TenantSettingUp />;
 
   // Show loading while checking (only for non-cloud, non-bypass routes)
-  if (loading && !shouldBypass && !isCloud) {
+  if ((loading || tenantState === null) && !shouldBypass && !isCloud) {
     return <FullScreenLoading />;
   }
 
