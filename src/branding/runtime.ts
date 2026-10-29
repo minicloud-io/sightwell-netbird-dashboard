@@ -17,3 +17,6 @@ export const docsUrl = () =>
 
 /** Hide the Integrations menu (default). Set SIGHTWELL_HIDE_INTEGRATIONS=false to show it. */
 export const hideIntegrations = () => config.sightwellHideIntegrations;
+
+/** Organisation name for the Sightwell app link and IT profile; undefined derives one from the host. */
+export const tenantName = () => config.sightwellTenantName;

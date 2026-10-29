@@ -27,5 +27,6 @@
   "analyticsExcludedEmails": "$NETBIRD_ANALYTICS_EXCLUDED_EMAILS",
   "announcement": "$NETBIRD_ANNOUNCEMENT",
   "sightwellDocsUrl": "$SIGHTWELL_DOCS_URL",
-  "sightwellHideIntegrations": "$SIGHTWELL_HIDE_INTEGRATIONS"
+  "sightwellHideIntegrations": "$SIGHTWELL_HIDE_INTEGRATIONS",
+  "sightwellTenantName": "$SIGHTWELL_TENANT_NAME"
 }

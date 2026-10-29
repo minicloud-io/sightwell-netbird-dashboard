@@ -79,8 +79,9 @@ mounts.
   `/var/lib/netbird`) and `Service`.
 - `Deployment <release>-dashboard` (rootless image, UID 10001) and
   `Service`, with the environment NetBird's getting-started uses for the
-  embedded IdP plus `SIGHTWELL_DOCS_URL` (`dashboard.docsUrl`) and
-  `SIGHTWELL_HIDE_INTEGRATIONS` (`dashboard.hideIntegrations`).
+  embedded IdP plus `SIGHTWELL_DOCS_URL` (`dashboard.docsUrl`),
+  `SIGHTWELL_HIDE_INTEGRATIONS` (`dashboard.hideIntegrations`) and
+  `SIGHTWELL_TENANT_NAME` (`dashboard.tenantName`).
 - Two `Ingress` objects for ingress-nginx: HTTP (`/api`, `/oauth2`,
   `/relay`, `/ws-proxy` to the server, `/` to the dashboard) and gRPC with
   `backend-protocol: GRPC` (`/management.ManagementService`,

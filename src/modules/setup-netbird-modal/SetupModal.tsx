@@ -37,6 +37,7 @@ import DockerTab from "@/modules/setup-netbird-modal/DockerTab";
 import IOSTab from "@/modules/setup-netbird-modal/IOSTab";
 import LinuxTab from "@/modules/setup-netbird-modal/LinuxTab";
 import MacOSTab from "@/modules/setup-netbird-modal/MacOSTab";
+import SightwellAppActions from "@/modules/setup-netbird-modal/SightwellAppActions";
 import WindowsTab from "@/modules/setup-netbird-modal/WindowsTab";
 
 type OidcUserInfo = {
@@ -147,6 +148,10 @@ export function SetupModalContent({
   const hideDocker = isUserDevice === true;
   const hideMobile = isUserDevice === false || !!setupKey;
   const showKeyGenerator = isUserDevice === false && !setupKey;
+  // Sightwell fork: the app link signs a person in, so it is offered only
+  // where a user device is being added, not for setup-key installs.
+  const showAppActions =
+    isUserDevice !== false && !effectiveSetupKey && !showOnlyRoutingPeerOS;
 
   // Keeps the `--setup-key SETUP_KEY` token visible before a key exists.
   const setupKeyPlaceholder = showKeyGenerator ? "SETUP_KEY" : undefined;
@@ -235,6 +240,8 @@ export function SetupModalContent({
           </Paragraph>
         </div>
       )}
+
+      {showAppActions && <SightwellAppActions />}
 
       <Tabs
         defaultValue={String(

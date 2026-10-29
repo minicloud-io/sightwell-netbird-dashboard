@@ -104,6 +104,7 @@ not done.
 | NetBird technology mark | `src/assets/icons/NetBirdIcon.tsx` | **unchanged** where it marks the NetBird client/server: peer version cell, posture checks, SSH instructions, owner role, invites table |
 | Sidebar | `src/layouts/Navigation.tsx` | "About" item added under Documentation; "Documentation" points at `SIGHTWELL_DOCS_URL`; "Integrations" hidden unless `SIGHTWELL_HIDE_INTEGRATIONS=false` |
 | Help menu | `src/components/ui/HelpAndSupportButton.tsx` | Documentation (`SIGHTWELL_DOCS_URL`), NetBird technical reference, client troubleshooting, NetBird community forum, About, Source code; NetBird Slack and the feedback form removed |
+| Add-device modal | `src/modules/setup-netbird-modal/SightwellAppActions.tsx`, `src/utils/sightwellApp.ts` | above the OS tabs, for user devices only: "Open in Sightwell app" (`sightwell://add-profile?name=<name>&url=https://<tenant host>`, which the desktop and iPhone apps confirm and then add, select and sign in) and "Download profile for IT (macOS)", a `.mobileconfig` built in the browser with fresh UUIDs that sets only `managementURL` under `ai.sightwell.connectivity`. The tenant is `NETBIRD_MGMT_GRPC_API_ENDPOINT`, else the page origin; https only, so neither shows on `http://localhost` (see the `Modules/Setup/SightwellAppActions` story) |
 | Announcements | `src/contexts/AnnouncementProvider.tsx` | remote NetBird banners off (`BRAND.announcementsUrl` empty); `NETBIRD_ANNOUNCEMENT` and billing notices still work; Storybook sets the feed URL so the banner stories render |
 | About page | `src/app/(dashboard)/about/` | new: identity, build, AGPL offer, help |
 | Source offer footer | `src/branding/BrandFooter.tsx` | setup wizard, invite, session lost, OIDC error, error page, pending approval |
@@ -143,10 +144,11 @@ property of the image:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `SIGHTWELL_DOCS_URL` | `https://sightwell.ai/connectivity` | where the sidebar "Documentation", the help menu's "Documentation" and the About page's primary documentation button point; http(s) only, anything else falls back to the default. NetBird's technical reference stays reachable from the help menu and About as "NetBird technical reference" |
+| `SIGHTWELL_TENANT_NAME` | empty | organisation name the "Open in Sightwell app" link and the IT profile carry (e.g. "Alder Cove Energy"); empty derives one from the host's first label (`aldercove-energy` becomes "Aldercove Energy") |
 | `SIGHTWELL_HIDE_INTEGRATIONS` | `true` | hides the Integrations menu (NetBird Cloud's integrations surface); only the string `false` shows it. The route itself is not removed |
 
-Read through `src/branding/runtime.ts` (`docsUrl()`, `hideIntegrations()`).
-The Helm chart sets both from `dashboard.docsUrl` and `dashboard.hideIntegrations`.
+Read through `src/branding/runtime.ts` (`docsUrl()`, `hideIntegrations()`, `tenantName()`).
+The Helm chart sets them from `dashboard.docsUrl`, `dashboard.hideIntegrations` and `dashboard.tenantName`.
 
 ## Storybook
 

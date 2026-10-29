@@ -41,6 +41,9 @@ interface Config {
   // default true; only the string "false" shows it).
   sightwellDocsUrl?: string;
   sightwellHideIntegrations: boolean;
+  // sightwellTenantName: organisation name for the app link and IT profile
+  // (SIGHTWELL_TENANT_NAME); empty derives one from the host.
+  sightwellTenantName?: string;
 }
 
 /**
@@ -111,6 +114,7 @@ const loadConfig = (): Config => {
     sightwellDocsUrl: configJson?.sightwellDocsUrl || undefined,
     sightwellHideIntegrations:
       configJson?.sightwellHideIntegrations !== "false",
+    sightwellTenantName: configJson?.sightwellTenantName || undefined,
   } as Config;
 };
 

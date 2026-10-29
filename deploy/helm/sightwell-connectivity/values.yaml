@@ -101,6 +101,9 @@ dashboard:
   docsUrl: https://sightwell.ai/connectivity
   # Hide the Integrations menu (the NetBird Cloud integrations surface).
   hideIntegrations: true
+  # Organisation name for the "Open in Sightwell app" link and the macOS IT
+  # profile, e.g. "Alder Cove Energy". Empty: derived from the host.
+  tenantName: ""
   # Extra environment for the dashboard, e.g. NETBIRD_ANNOUNCEMENT: "Staging"
   extraEnv: {}
   podSecurityContext:
